@@ -57,7 +57,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private FPSCounter fpsCounter;
 
 
-
     public BasicActivityRender(Context context) {
         this.context = context;
         angle = 0;
@@ -76,7 +75,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
 
         PlyParser plyP = new PlyParser(context, R.raw.medium_res_example);
         lowResExample = new PointModel(plyP.getVertexBuffer(), plyP.getColorBuffer());
-
         mCubeRotation = 0;
 
     }
