@@ -1,6 +1,7 @@
 package com.example.jakob.PointCloudVisualizer;
 
 import android.opengl.GLSurfaceView;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,11 +9,10 @@ import android.view.MenuItem;
 
 
 public class BasicActivity extends ActionBarActivity {
+    private static final String DEBUG_TAG = "Gesture";
     private GLSurfaceView glSurfaceView;
     private boolean renderSet = false;
-
-    private float mPreviousX = 0f;
-    private float mPreviousY = 0f;
+    private GestureDetectorCompat mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,5 +54,4 @@ public class BasicActivity extends ActionBarActivity {
         super.onResume();
         glSurfaceView.onResume();
     }
-
 }

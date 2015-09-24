@@ -32,7 +32,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private static final String A_COLOR = "a_Color";
     private static final String U_MATRIX = "u_Matrix";
 
-    static final int BYTES_PER_FLOAT = 4;
     static final int COLOR_COMPONENT_COUNT = 3;
     static final int POSITION_COMPONENT_COUNT = 3;
 
@@ -40,26 +39,33 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
 
     private Cube mCube;
     private PointModel lowResExample;
-    private float mCubeRotation;
-    private int mu_MatrixHandle;
+    private FPSCounter fpsCounter;
 
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
     private final float[] mModelMatrix= new float[16];
+    private final float[] mRotMatrixX= new float[16];
+    private final float[] mRotMatrixY= new float[16];
+    private final float[] mRotMatrix= new float[16];
     private int aPositionLocation;
     private int mMVPMatrixLocation;
     public int uColorLocation;
     public int aColorLocation;
-    private float angle;
-    private float scale;
 
-    private FPSCounter fpsCounter;
+    private float rotX;
+    private float rotY;
+    private float rotZ;
+    private float scale;
+    private float transX;
+    private float transY;
+
 
 
     public BasicActivityRender(Context context) {
         this.context = context;
-        angle = 0;
+        rotX = 0;
+        rotY = 0;
         scale = 10;
         fpsCounter = new FPSCounter();
     }
@@ -75,8 +81,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
 
         PlyParser plyP = new PlyParser(context, R.raw.medium_res_example);
         lowResExample = new PointModel(plyP.getVertexBuffer(), plyP.getColorBuffer());
-        mCubeRotation = 0;
-
     }
 
     public void receiveLocations(){
@@ -86,14 +90,12 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         mMVPMatrixLocation = glGetUniformLocation(mProgram, U_MATRIX );
     }
 
-
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         float ratio = (float) width / height;
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
     }
-
 
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -104,16 +106,18 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         Matrix.setLookAtM(mViewMatrix, 0, 0, 4, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         // Calculate the projection and view transformation
         float[] mVPMatrix = new float[16];
-        float[] scaleM= new float[16];
 
-        //Matrix.scaleM(scaleM,0, 3.0f, 3.0f, 3.0f);
-        Matrix.setRotateM(mModelMatrix, 0, angle, 0.5f, 0.5f, 0.0f);
+        Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.scaleM(mModelMatrix, 0, scale, scale, scale);
-        //Matrix.multiplyMM(mModelMatrix, 0,mModelMatrix, 0, scaleM, 0);
-        Matrix.multiplyMM(mVPMatrix, 0,  mViewMatrix, 0, mModelMatrix , 0);
+        Matrix.setRotateM(mRotMatrixX, 0, rotY, 1.0f, 0.0f, 0.0f);
+        Matrix.setRotateM(mRotMatrixY, 0, rotZ, 0.0f, 0.0f, 1.0f);
+        Matrix.multiplyMM(mRotMatrix, 0, mRotMatrixX, 0, mRotMatrixY, 0);
+        final float[] temp= new float[16];
+        Matrix.multiplyMM(temp, 0,mRotMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mVPMatrix, 0,  mViewMatrix, 0,temp, 0);
+        //Matrix.multiplyMM(mVPMatrix, 0, mViewMatrix, 0, mRotMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mVPMatrix, 0);
-        // get handle to shape's transformation matrix
-        // Pass the projection and view transformation to the shader
+
         GLES20.glUniformMatrix4fv(mMVPMatrixLocation, 1, false, mMVPMatrix, 0);
         // Draw shape
         lowResExample.bindVertex(aPositionLocation);
@@ -132,12 +136,12 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         return ShaderHelper.linkProgram(fragmentShaderId, vertexShaderId);
     }
 
-    public float getAngle() {
-        return angle;
+    public float getRotX() {
+        return rotX;
     }
 
-    public void setAngle(float angle) {
-        this.angle = angle;
+    public void setRotX(float rotX) {
+        this.rotX = rotX;
     }
 
     public float getScale() {
@@ -146,5 +150,17 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
 
     public void setScale(float scale) {
         this.scale = scale;
+    }
+
+    public void setRotY(float rotY) {
+        this.rotY = rotY;
+    }
+
+    public float getRotZ() {
+        return rotZ;
+    }
+
+    public void setRotZ(float rotZ) {
+        this.rotZ = rotZ;
     }
 }
