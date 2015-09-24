@@ -5,16 +5,27 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
+import android.support.v4.view.GestureDetectorCompat;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.widget.Toast;
 
-public class BasicAcitivtySurfaceView extends GLSurfaceView {
+public class BasicAcitivtySurfaceView extends GLSurfaceView  {
 
+    private static final String DEBUG_TAG = "Gesture";
     private final BasicActivityRender mRenderer;
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     private float mPreviousX;
     private float mPreviousY;
+    private float mScaleFactor;
     private boolean twoPointersDown = false;
+    private boolean renderSet;
+    private GestureDetectorCompat mDetector;
+    private ScaleGestureDetector mScaleDetector;
+
+
 
     public boolean isRenderSet() {
         return renderSet;
@@ -24,10 +35,10 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView {
         this.renderSet = renderSet;
     }
 
-    private boolean renderSet;
 
     public BasicAcitivtySurfaceView(Context context) {
         super(context);
+        mScaleFactor = 1;
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
         mRenderer = new BasicActivityRender(context);
@@ -41,6 +52,18 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView {
         }
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(mRenderer);
+        GestureListener gestureHandler = new GestureListener();
+        mDetector = new GestureDetectorCompat(context,gestureHandler);
+        mDetector.setOnDoubleTapListener(gestureHandler);
+        mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        this.mDetector.onTouchEvent(e);
+        this.mScaleDetector.onTouchEvent(e);
+        // Be sure to call the superclass implementation
+        return true;
     }
 
     private boolean supportsEs2(Context context){
@@ -58,54 +81,91 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView {
     }
 
 
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
+    private class GestureListener implements GestureDetector.OnGestureListener,
+            GestureDetector.OnDoubleTapListener {
 
-        switch (e.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mPreviousX = e.getX();
-                mPreviousY = e.getY();
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                twoPointersDown = true;
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                twoPointersDown = false ;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (twoPointersDown){
-
-                } else {
-                   handleRotation(e);
-                }
-                break;
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onDown: " + event.toString());
+            return true;
         }
-        requestRender();
-        return true;
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onLongPress: " + event.toString());
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                                float distanceY) {
+            Log.d(DEBUG_TAG, "onScroll: " + e1.toString()+e2.toString());
+            mPreviousX += distanceX;
+            mPreviousY += distanceY;
+            mRenderer.setRotZ(mPreviousX);
+            mRenderer.setRotY(mPreviousY);
+
+            return true;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onShowPress: " + event.toString());
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onDoubleTapEvent: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onSingleTapConfirmed: " + event.toString());
+            return true;
+        }
     }
-    private void handleRotation(MotionEvent e){
-        float x = e.getX();
-        float y = e.getY();
 
-        float dx = x - mPreviousX;
-        float dy = y - mPreviousY;
+    private class ScaleListener implements ScaleGestureDetector.OnScaleGestureListener{
 
-        // reverse direction of rotation above the mid-line
-        if (y > getHeight() / 2) {
-            dx = dx * -1;
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            mScaleFactor *= detector.getScaleFactor();
+
+            // Don't let the object get too small or too large.
+            mScaleFactor = Math.max(1.0f, Math.min(mScaleFactor, 20.0f));
+            mRenderer.setScale(mScaleFactor);
+            Log.v("ScaleListeneer", String.valueOf(mScaleFactor));
+            invalidate();
+            return true;
         }
-        // reverse direction of rotation to left of the mid-line
-        if (x < getWidth() / 2) {
-            dy = dy * -1;
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            return true;
         }
 
-        mRenderer.setAngle(
-                mRenderer.getAngle() +
-                        ((dx + dy) * TOUCH_SCALE_FACTOR));
-
-        mPreviousX = x;
-        mPreviousY = y;
-
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+        }
     }
 }
 
