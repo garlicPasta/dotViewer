@@ -79,7 +79,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         glUseProgram(mProgram);
         receiveLocations();
 
-        PlyParser plyP = new PlyParser(context, R.raw.medium_res_example);
+        PlyParser plyP = new PlyParser(context, R.raw.low_res_example);
         lowResExample = new PointModel(plyP.getVertexBuffer(), plyP.getColorBuffer());
     }
 
