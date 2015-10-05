@@ -31,6 +31,14 @@ public class PointModel {
         size = vertices.length / 3;
     }
 
+    PointModel(FloatBuffer vertices, FloatBuffer colors) {
+        mVertexBuffer = vertices;
+        mVertexBuffer.position(0);
+        mColorBuffer = colors;
+        mColorBuffer.position(0);
+        size = vertices.capacity() / 3;
+    }
+
     private FloatBuffer buildFloatBuffer(float[] array, int typeSize){
         ByteBuffer byteBuf = ByteBuffer.allocateDirect(array.length * typeSize);
         byteBuf.order(ByteOrder.nativeOrder());

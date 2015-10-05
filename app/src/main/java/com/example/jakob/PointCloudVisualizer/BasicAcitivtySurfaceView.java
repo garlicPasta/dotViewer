@@ -38,7 +38,7 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
 
     public BasicAcitivtySurfaceView(Context context) {
         super(context);
-        mScaleFactor = 1;
+        mScaleFactor = 10;
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
         mRenderer = new BasicActivityRender(context);

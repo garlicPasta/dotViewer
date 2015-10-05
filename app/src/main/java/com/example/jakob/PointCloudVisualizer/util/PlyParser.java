@@ -7,19 +7,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.LinkedList;
 
 
 public class PlyParser {
 
-    private int propertyCounter;
 
     private enum State{
         Header, Vertices, Indices
     }
 
+    private int propertyCounter;
     private LinkedList<float[]> vertexes;
     private float[] vertexBuffer;
+    private FloatBuffer vertexBufferDirect;
+    private FloatBuffer colorBufferDirect;
     private float[] colorBuffer;
     private LinkedList<float[]> indices;
     private State parserState = State.Header;
@@ -71,8 +76,17 @@ public class PlyParser {
     private void processHeaderLine(String nextLine){
             if (nextLine.contains("end_header")){
                 parserState = State.Vertices;
-                vertexBuffer = new float[3 * verticesCounter];
-                colorBuffer = new float[3 * verticesCounter];
+
+                ByteBuffer byteBuf = ByteBuffer.allocateDirect(3 * 4 * verticesCounter);
+                byteBuf.order(ByteOrder.nativeOrder());
+                vertexBufferDirect = byteBuf.asFloatBuffer();
+                vertexBufferDirect.position(0);
+
+                byteBuf = ByteBuffer.allocateDirect(3 * 4 * verticesCounter);
+                byteBuf.order(ByteOrder.nativeOrder());
+                colorBufferDirect = byteBuf.asFloatBuffer();
+                colorBufferDirect.position(0);
+
                 indexVertices= 0;
                 indexColor = 0;
             }else {
@@ -94,10 +108,10 @@ public class PlyParser {
         String[] list = nextLine.split(" ");
 
         for(int i=0; i < 3 ; i++) {
-            vertexBuffer[indexVertices++] = Float.valueOf(list[i]);
+            vertexBufferDirect.put(Float.valueOf(list[i]));
         }
         for(int i=3; i < propertyCounter ; i++) {
-            colorBuffer[indexColor++] = Float.valueOf(list[i]) / 255.0f;
+            colorBufferDirect.put(Float.valueOf(list[i]) / 255.0f);
         }
         currentVerticesCounter++;
     }
@@ -112,12 +126,12 @@ public class PlyParser {
         indices.add(listCoords);
     }
 
-    public float[] getVertexBuffer() {
-        return vertexBuffer;
+    public FloatBuffer getVertexBuffer() {
+        return vertexBufferDirect;
     }
 
-    public float[] getColorBuffer() {
-        return colorBuffer;
+    public FloatBuffer getColorBuffer() {
+        return colorBufferDirect;
     }
 }
 
