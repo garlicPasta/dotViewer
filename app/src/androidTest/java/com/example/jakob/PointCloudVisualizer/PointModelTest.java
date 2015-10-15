@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 public class PointModelTest extends TestCase {
 
-    PointModel cube;
+    PointModelGL cube;
 
     private float vertices[] = {
             -1.0f, -1.0f, -1.0f,
@@ -18,7 +18,7 @@ public class PointModelTest extends TestCase {
     };
 
     public void setUp() {
-        cube = new PointModel(vertices);
+        cube = new PointModelGL(vertices);
         assertNotNull(cube);
     }
 
