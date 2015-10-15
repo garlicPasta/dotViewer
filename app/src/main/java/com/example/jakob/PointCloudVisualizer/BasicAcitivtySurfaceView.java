@@ -16,15 +16,12 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
 
     private static final String DEBUG_TAG = "Gesture";
     private final BasicActivityRender mRenderer;
-    private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     private float mPreviousX;
     private float mPreviousY;
     private float mScaleFactor;
-    private boolean twoPointersDown = false;
     private boolean renderSet;
     private GestureDetectorCompat mDetector;
     private ScaleGestureDetector mScaleDetector;
-
 
 
     public boolean isRenderSet() {
@@ -105,12 +102,20 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
-            Log.d(DEBUG_TAG, "onScroll: " + e1.toString()+e2.toString());
-            mPreviousX += distanceX;
-            mPreviousY += distanceY;
-            mRenderer.setRotZ(mPreviousX);
-            mRenderer.setRotY(mPreviousY);
-
+            if (e2.getPointerCount() == 2){
+                Log.d(DEBUG_TAG, "2Finger scroll: " + e1.toString() + e2.toString());
+                Log.d(DEBUG_TAG, "2Finger scroll: " + distanceX + distanceY);
+                float currentTransX = mRenderer.getTransX();
+                float currentTransY = mRenderer.getTransY();
+                mRenderer.setTransX(currentTransX + distanceX/50);
+                mRenderer.setTransY(currentTransY + distanceY/50);
+            }else {
+                Log.d(DEBUG_TAG, "onScroll: " + e1.toString() + e2.toString());
+                mPreviousX += distanceX;
+                mPreviousY += distanceY;
+                mRenderer.setRotZ(mPreviousX);
+                mRenderer.setRotY(mPreviousY);
+            }
             return true;
         }
 

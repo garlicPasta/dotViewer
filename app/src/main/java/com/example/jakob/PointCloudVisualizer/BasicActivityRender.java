@@ -38,7 +38,9 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private int mProgram;
 
     private Cube mCube;
-    private PointModel lowResExample;
+    private PointModelGL model;
+    private PointModelGL centerPoint;
+    private Cube plane;
     private FPSCounter fpsCounter;
 
     private final float[] mMVPMatrix = new float[16];
@@ -47,7 +49,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private final float[] mModelMatrix= new float[16];
     private final float[] mRotMatrixX= new float[16];
     private final float[] mRotMatrixY= new float[16];
-    private final float[] mRotMatrix= new float[16];
+    private float[] mRotMatrix= new float[16];
     private int aPositionLocation;
     private int mMVPMatrixLocation;
     public int uColorLocation;
@@ -59,14 +61,17 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private float scale;
     private float transX;
     private float transY;
-
+    private float transZ;
 
 
     public BasicActivityRender(Context context) {
         this.context = context;
         rotX = 0;
         rotY = 0;
-        scale = 10;
+        scale = 1;
+        transX = 0;
+        transY = 0;
+        transZ = 0;
         fpsCounter = new FPSCounter();
     }
 
@@ -78,9 +83,13 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
-
         PlyParser plyP = new PlyParser(context, R.raw.low_res_example);
-        lowResExample = new PointModel(plyP.getVertexBuffer(), plyP.getColorBuffer());
+        model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
+        float [] c = model.getCentroid();
+        transX = c[0];
+        transY = c[1];
+        transZ = c[2];
+        //plane =  ;
     }
 
     public void receiveLocations(){
@@ -94,7 +103,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         float ratio = (float) width / height;
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 20000);
     }
 
     @Override
@@ -102,28 +111,39 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BITS);
         glFrontFace(GL_CCW);
+        float[] mMVMatrix = new float[16];
+        float[] transMatrix = new float[16];
+        float[] scaleMatrix= new float[16];
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 4, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, -10.0f, 0f, 0f, 1f, 0f, 1.0f, 0.0f);
         // Calculate the projection and view transformation
-        float[] mVPMatrix = new float[16];
+        Matrix.setIdentityM(scaleMatrix, 0);
+        Matrix.scaleM(scaleMatrix, 0, scale, scale, scale);
+        Matrix.setIdentityM(transMatrix, 0);
+        Matrix.translateM(transMatrix, 0, transX, transY, 0);
+        mRotMatrix = rotationMatrix(rotX, rotY, rotZ);
+        Matrix.multiplyMM(mRotMatrix, 0, mRotMatrix, 0,scaleMatrix, 0);
+        Matrix.multiplyMM(mModelMatrix, 0, transMatrix, 0, mRotMatrix, 0);
+        Matrix.multiplyMM(mMVMatrix, 0,  mViewMatrix, 0,mModelMatrix, 0);
+        //Matrix.multiplyMM(mVPMatrix, 0, mViewMatrix, 0, mRotMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixLocation, 1, false, mMVPMatrix, 0);
+        // Draw shape
+        model.bindVertex(aPositionLocation);
+        model.bindColor(aColorLocation);
+        model.draw();
+        fpsCounter.logFrame();
+    }
 
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.scaleM(mModelMatrix, 0, scale, scale, scale);
+    private float[] rotationMatrix(float rotX, float rotY, float rotZ){
+        float[] mRotMatrixX = new float[16];
+        float[] mRotMatrixY = new float[16];
+        float[] mRotMatrix =  new float[16];
+
         Matrix.setRotateM(mRotMatrixX, 0, rotY, 1.0f, 0.0f, 0.0f);
         Matrix.setRotateM(mRotMatrixY, 0, rotZ, 0.0f, 0.0f, 1.0f);
         Matrix.multiplyMM(mRotMatrix, 0, mRotMatrixX, 0, mRotMatrixY, 0);
-        final float[] temp= new float[16];
-        Matrix.multiplyMM(temp, 0,mRotMatrix, 0, mModelMatrix, 0);
-        Matrix.multiplyMM(mVPMatrix, 0,  mViewMatrix, 0,temp, 0);
-        //Matrix.multiplyMM(mVPMatrix, 0, mViewMatrix, 0, mRotMatrix, 0);
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mVPMatrix, 0);
-
-        GLES20.glUniformMatrix4fv(mMVPMatrixLocation, 1, false, mMVPMatrix, 0);
-        // Draw shape
-        lowResExample.bindVertex(aPositionLocation);
-        lowResExample.bindColor(aColorLocation);
-        lowResExample.draw();
-        fpsCounter.logFrame();
+        return mRotMatrix;
     }
 
     public int createOpenGlProgram(){
@@ -162,5 +182,21 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
 
     public void setRotZ(float rotZ) {
         this.rotZ = rotZ;
+    }
+
+    public float getTransX() {
+        return transX;
+    }
+
+    public void setTransX(float transX) {
+        this.transX = transX;
+    }
+
+    public float getTransY() {
+        return transY;
+    }
+
+    public void setTransY(float transY) {
+        this.transY = transY;
     }
 }
