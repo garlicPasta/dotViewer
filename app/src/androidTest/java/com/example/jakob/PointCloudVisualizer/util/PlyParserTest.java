@@ -2,6 +2,9 @@ package com.example.jakob.PointCloudVisualizer.util;
 
 import android.test.AndroidTestCase;
 import com.example.jakob.PointCloudVisualizer.R;
+
+import java.nio.FloatBuffer;
+
 import static org.junit.Assert.*;
 
 public class PlyParserTest extends AndroidTestCase {
@@ -23,13 +26,13 @@ public class PlyParserTest extends AndroidTestCase {
             70, 70, 58,
             138, 134, 112
         };
-        float[] actualValue;
+        FloatBuffer actualValue;
         for (int i=0; i<expectValue.length; ++i){
             expectValue[i] /= d;
         }
         actualValue = parser.getColorBuffer();
-        assertEquals(EXAMPLE_POINTS * 3, parser.getVertexBuffer().length);
-        assertArrayEquals(expectValue, actualValue, 0.0f);
+        assertEquals(EXAMPLE_POINTS * 3, parser.getVertexBuffer().capacity());
+        assertArrayEquals(expectValue, actualValue.array(), 0.0f);
     }
 
     public void testVertexBuffer(){
@@ -39,8 +42,8 @@ public class PlyParserTest extends AndroidTestCase {
                 6.52307595559f, 7.44617049958f, 2.85959904481f,
                 9.11698100566f, 1.58804032241f, 3.31590484207f
         };
-        float[] actualValue = parser.getVertexBuffer();
-        assertEquals(EXAMPLE_POINTS * 3, parser.getVertexBuffer().length);
-        assertArrayEquals(expectValue, actualValue, 0.0f);
+        FloatBuffer actualValue = parser.getVertexBuffer();
+        assertEquals(EXAMPLE_POINTS * 3, parser.getVertexBuffer().capacity());
+        assertArrayEquals(expectValue, actualValue.array(), 0.0f);
     }
 }

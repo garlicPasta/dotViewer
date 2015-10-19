@@ -35,7 +35,7 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
 
     public BasicAcitivtySurfaceView(Context context) {
         super(context);
-        mScaleFactor = 10;
+        mScaleFactor = 1;
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
         mRenderer = new BasicActivityRender(context);
@@ -156,7 +156,7 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
             mScaleFactor *= detector.getScaleFactor();
 
             // Don't let the object get too small or too large.
-            mScaleFactor = Math.max(1.0f, Math.min(mScaleFactor, 20.0f));
+            mScaleFactor = Math.max(0.01f, Math.min(mScaleFactor, 100.0f));
             mRenderer.setScale(mScaleFactor);
             Log.v("ScaleListeneer", String.valueOf(mScaleFactor));
             invalidate();
