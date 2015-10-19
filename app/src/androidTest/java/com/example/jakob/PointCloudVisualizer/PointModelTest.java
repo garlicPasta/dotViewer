@@ -2,6 +2,8 @@ package com.example.jakob.PointCloudVisualizer;
 
 import junit.framework.TestCase;
 
+import java.util.Arrays;
+
 public class PointModelTest extends TestCase {
 
     PointModelGL cube;
@@ -23,6 +25,10 @@ public class PointModelTest extends TestCase {
     }
 
     public void testSize(){
-        assertEquals(cube.getSize(),8);
+        assertEquals(cube.getSize(), 8);
+    }
+
+    public void testCentroid(){
+        assertTrue(Arrays.equals(cube.getCentroid(), new float[]{0f, 0f, 0f}));
     }
 }
