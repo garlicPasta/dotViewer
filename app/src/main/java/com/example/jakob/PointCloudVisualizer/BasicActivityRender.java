@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
+import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import com.example.jakob.PointCloudVisualizer.util.PlyParser;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
 import com.example.jakob.PointCloudVisualizer.util.TextResourceReader;
@@ -43,7 +44,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private Cube plane;
     private FPSCounter fpsCounter;
 
-    private final float[] mMVPMatrix = new float[16];
+    private float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
     private final float[] mModelMatrix= new float[16];
@@ -84,7 +85,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
-        PlyParser plyP = new PlyParser(context, R.raw.medium_res_example);
+        PlyParser plyP = new PlyParser(context, R.raw.low_res_example);
         model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
         centroid = model.getCentroid();
     }
@@ -122,11 +123,12 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(centerMatrix, 0);
         Matrix.translateM(centerMatrix, 0, -centroid[0], -centroid[1], -centroid[2]);
         mRotMatrix = rotationMatrix(rotX, rotY, rotZ);
-        Matrix.multiplyMM(scaleMatrix, 0, scaleMatrix, 0, centerMatrix, 0);
-        Matrix.multiplyMM(mRotMatrix, 0, mRotMatrix, 0,scaleMatrix, 0);
-        Matrix.multiplyMM(mModelMatrix, 0, transMatrix, 0, mRotMatrix, 0);
-        Matrix.multiplyMM(mMVMatrix, 0,  mViewMatrix, 0,mModelMatrix, 0);
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+        mMVPMatrix = MatrixHelper.multMatrices(mProjectionMatrix,
+                mViewMatrix,
+                transMatrix,
+                mRotMatrix,
+                scaleMatrix,
+                centerMatrix);
         GLES20.glUniformMatrix4fv(mMVPMatrixLocation, 1, false, mMVPMatrix, 0);
         // Draw shape
         model.bindVertex(aPositionLocation);

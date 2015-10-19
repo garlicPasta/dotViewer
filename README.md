@@ -3,9 +3,8 @@
 Android Application for displaying a pointcloud(xyzrgb) streamed from a server.
 
 Features so far:
-
-* Allows to rotate the object
-* Loads and displays models from disc and display then in color
+* Loads and displays models from disc in color
+* Allows to rotate, translate and zoom the object
 
 
 
