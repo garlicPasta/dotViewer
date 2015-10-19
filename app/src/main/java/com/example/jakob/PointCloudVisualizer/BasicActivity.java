@@ -6,13 +6,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class BasicActivity extends ActionBarActivity {
-    private static final String DEBUG_TAG = "Gesture";
     private GLSurfaceView glSurfaceView;
     private boolean renderSet = false;
-    private GestureDetectorCompat mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +36,13 @@ public class BasicActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.load_model) {
+            CharSequence text = "Lets load a model!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this, text, duration);
+            toast.show();
             return true;
         }
 
