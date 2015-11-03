@@ -106,7 +106,7 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
                 mRenderer.addToTranslation(new float[]{distanceX, distanceY, 0});
             }else {
                 Log.d(DEBUG_TAG, "onScroll: " + e1.toString() + e2.toString());
-                mRenderer.setRotation(new float[]{distanceY, distanceX, 0});
+                mRenderer.setRotation(new float[]{distanceY, -distanceX, 0});
             }
             return true;
         }
