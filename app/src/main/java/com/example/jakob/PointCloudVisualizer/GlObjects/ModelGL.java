@@ -18,7 +18,7 @@ public abstract class ModelGL {
     protected FloatBuffer mVertexBuffer;
     private FloatBuffer mColorBuffer;
     private float scale;
-    int vertexCount;
+    public int vertexCount;
 
     float[] modelMatrix;
     float[] transMatrix;

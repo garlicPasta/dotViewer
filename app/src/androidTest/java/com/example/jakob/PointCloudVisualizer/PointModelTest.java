@@ -27,7 +27,7 @@ public class PointModelTest extends TestCase {
     }
 
     public void testSize(){
-        assertEquals(cube.getSize(), 8);
+        assertEquals(cube.vertexCount, 8);
     }
 
     public void testCentroid(){
