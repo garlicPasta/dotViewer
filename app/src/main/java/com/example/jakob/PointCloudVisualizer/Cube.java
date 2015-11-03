@@ -14,9 +14,6 @@ import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.COLOR_C
 import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.POSITION_COMPONENT_COUNT;
 
 
-/**
- * Created by jakob on 8/20/15.
- */
 class Cube {
 
     private FloatBuffer mVertexBuffer;

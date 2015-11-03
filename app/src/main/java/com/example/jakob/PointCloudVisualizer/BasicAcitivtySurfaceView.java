@@ -16,8 +16,6 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
 
     private static final String DEBUG_TAG = "Gesture";
     private final BasicActivityRender mRenderer;
-    private float mPreviousX;
-    private float mPreviousY;
     private float mScaleFactor;
     private boolean renderSet;
     private GestureDetectorCompat mDetector;
@@ -105,16 +103,10 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
             if (e2.getPointerCount() == 2){
                 Log.d(DEBUG_TAG, "2Finger scroll: " + e1.toString() + e2.toString());
                 Log.d(DEBUG_TAG, "2Finger scroll: " + distanceX + distanceY);
-                float currentTransX = mRenderer.getTransX();
-                float currentTransY = mRenderer.getTransY();
-                mRenderer.setTransX(currentTransX + distanceX/50);
-                mRenderer.setTransY(currentTransY + distanceY/50);
+                mRenderer.addToTranslation(new float[]{distanceX, distanceY, 0});
             }else {
                 Log.d(DEBUG_TAG, "onScroll: " + e1.toString() + e2.toString());
-                mPreviousX += distanceX;
-                mPreviousY += distanceY;
-                mRenderer.setRotZ(mPreviousX);
-                mRenderer.setRotY(mPreviousY);
+                mRenderer.setRotation(new float[]{distanceY, distanceX, 0});
             }
             return true;
         }
@@ -154,8 +146,6 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             mScaleFactor *= detector.getScaleFactor();
-
-            // Don't let the object get too small or too large.
             mScaleFactor = Math.max(0.01f, Math.min(mScaleFactor, 100.0f));
             mRenderer.setScale(mScaleFactor);
             Log.v("ScaleListeneer", String.valueOf(mScaleFactor));

@@ -1,4 +1,4 @@
-package com.example.jakob.PointCloudVisualizer;
+package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 import java.nio.FloatBuffer;
 
@@ -22,7 +22,7 @@ public class PolyModelGL extends ModelGL{
     }
 
     public void draw() {
-        glDrawArrays(GL_TRIANGLES, 0 , size);
+        glDrawArrays(GL_TRIANGLES, 0 , vertexCount);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.jakob.PointCloudVisualizer;
 
+import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
+
 import junit.framework.TestCase;
 
 import java.util.Arrays;

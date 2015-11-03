@@ -1,7 +1,6 @@
 package com.example.jakob.PointCloudVisualizer;
 
 import android.opengl.GLSurfaceView;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -39,6 +38,13 @@ public class BasicActivity extends ActionBarActivity {
             return true;
         }
         if (id == R.id.load_model) {
+            CharSequence text = "Lets load a model!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this, text, duration);
+            toast.show();
+            return true;
+        }
+        if (id == R.id.center_model) {
             CharSequence text = "Lets load a model!";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(this, text, duration);

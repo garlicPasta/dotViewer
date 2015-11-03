@@ -22,16 +22,12 @@ public class PlyParser {
 
     private int propertyCounter;
     private LinkedList<float[]> vertexes;
-    private float[] vertexBuffer;
     private FloatBuffer vertexBufferDirect;
     private FloatBuffer colorBufferDirect;
-    private float[] colorBuffer;
     private LinkedList<float[]> indices;
     private State parserState = State.Header;
     private int verticesCounter;
     private int currentVerticesCounter;
-    private int indexVertices;
-    private int indexColor;
 
 
     public PlyParser(Context context, int resourceId) {
@@ -86,9 +82,6 @@ public class PlyParser {
                 byteBuf.order(ByteOrder.nativeOrder());
                 colorBufferDirect = byteBuf.asFloatBuffer();
                 colorBufferDirect.position(0);
-
-                indexVertices= 0;
-                indexColor = 0;
             }else {
                 if (nextLine.contains("element vertex")) {
                     verticesCounter = Integer.valueOf(nextLine.split(" ")[2]);

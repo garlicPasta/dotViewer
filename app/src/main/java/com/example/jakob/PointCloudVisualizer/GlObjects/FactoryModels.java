@@ -1,5 +1,8 @@
-package com.example.jakob.PointCloudVisualizer;
+package com.example.jakob.PointCloudVisualizer.GlObjects;
 
+
+import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.PolyModelGL;
 
 public class FactoryModels {
 
@@ -10,14 +13,16 @@ public class FactoryModels {
     }
 
     public static PolyModelGL buildPlane(){
-        float[] vertex = {0f,0f,0f,
+        float[] vertex = {
+                0f,0f,0f,
                 1f,0f,1f,
                 0f, 0f, 1f,
                 0f,0f,0f,
                 1f, 0f, 0f,
                 1f, 0f, 1f};
 
-        float[] color = {1f,1f,1f,
+        float[] color = {
+                1f, 1f, 1f,
                 0f, 0f, 0f,
                 0f, 0f, 0f,
                 1f, 1f, 1f,
