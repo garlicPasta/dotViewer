@@ -13,6 +13,7 @@ import static android.opengl.GLES20.glVertexAttribPointer;
 import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.COLOR_COMPONENT_COUNT;
 import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.POSITION_COMPONENT_COUNT;
 import static android.opengl.GLES20.GL_FLOAT;
+import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildFloatBuffer;
 
 public abstract class ModelGL {
     protected FloatBuffer mVertexBuffer;
@@ -63,14 +64,6 @@ public abstract class ModelGL {
         Matrix.scaleM(scaleMatrix, 0, scale, scale, scale);
     }
 
-    private static FloatBuffer buildFloatBuffer(float[] array, int typeSize){
-        ByteBuffer byteBuf = ByteBuffer.allocateDirect(array.length * typeSize);
-        byteBuf.order(ByteOrder.nativeOrder());
-        FloatBuffer buffer = byteBuf.asFloatBuffer();
-        buffer.put(array);
-        buffer.position(0);
-        return buffer;
-    }
 
     public void bindVertex(int aPositionLocation){
         glVertexAttribPointer(aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT,

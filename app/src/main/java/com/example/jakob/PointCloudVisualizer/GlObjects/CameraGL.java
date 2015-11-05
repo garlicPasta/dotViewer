@@ -10,7 +10,7 @@ public class CameraGL {
     public CameraGL(float ratio) {
         viewMatrix = new float[16];
         projectionMatrix = new float[16];
-        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -30.0f, 0f, 0f, 1f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -10.0f, 0f, 0f, 1f, 0f, 1.0f, 0.0f);
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 20000);
     }
 
