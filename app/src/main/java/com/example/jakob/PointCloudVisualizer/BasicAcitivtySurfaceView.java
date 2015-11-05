@@ -150,7 +150,7 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             mScaleFactor *= detector.getScaleFactor();
-            mScaleFactor = Math.max(0.01f, Math.min(mScaleFactor, 100.0f));
+            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 10.0f));
             mRenderer.setScale(mScaleFactor);
             Log.v("ScaleListeneer", String.valueOf(mScaleFactor));
             invalidate();

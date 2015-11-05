@@ -106,5 +106,11 @@ public abstract class ModelGL {
         MatrixHelper.rotationMatrix(rotationMatrix, angles);
     }
 
+    public void scale(float scale){
+        scaleMatrix[0]= scale;
+        scaleMatrix[5]= scale;
+        scaleMatrix[10]= scale;
+    }
+
     public abstract void draw();
 }

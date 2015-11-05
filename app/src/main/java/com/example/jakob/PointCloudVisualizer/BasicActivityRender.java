@@ -133,17 +133,11 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         scene.rotateScene(rotation);
     }
 
-    public void addToRotation(float[] rotation) {
-        for (int i=0; i< this.rotation.length ; i++){
-            this.rotation[i] += rotation[i];
-        }
-    }
-
     public float getScale() {
         return scale;
     }
 
     public void setScale(float scale) {
-        this.scale = scale;
+        scene.scaleScene(scale);
     }
 }

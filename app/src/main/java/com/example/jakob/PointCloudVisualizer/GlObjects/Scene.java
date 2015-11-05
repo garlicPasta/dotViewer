@@ -42,4 +42,8 @@ public class Scene {
         //this.camera.rotate(angles);
         sceneModels.get(0).rotate(angles);
     }
+
+    public void scaleScene(float scale){
+        sceneModels.get(0).scale(scale);
+    }
 }
