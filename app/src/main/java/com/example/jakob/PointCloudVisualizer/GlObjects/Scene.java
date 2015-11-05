@@ -1,22 +1,42 @@
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.microedition.khronos.opengles.GL10;
+
+import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_CCW;
+import static android.opengl.GLES20.GL_DELETE_STATUS;
+import static android.opengl.GLES20.GL_DEPTH_BITS;
+import static android.opengl.GLES20.GL_DEPTH_TEST;
+
+import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildBackground;
+import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildPlane;
+
 public class Scene {
     List<ModelGL> sceneModels;
+    PolyModelGL background;
     CameraGL camera;
+    GL10 gl;
 
-    public Scene(){
+    float[] mvpMatrix;
+
+    public Scene(GL10 gl){
+        this.gl = gl;
         sceneModels = new LinkedList<>();
+        setupBackground();
+        mvpMatrix = new float[16];
     }
 
     public void drawScene(int aPositionLocation, int aColorLocation, int uMVPMatrixLocation){
-        float[] mvpMatrix = new float[16];
+        drawBackgroud(aPositionLocation, aColorLocation, uMVPMatrixLocation);
+        Matrix.setIdentityM(mvpMatrix, 0);
         for (ModelGL model : sceneModels){
             MatrixHelper.multMatrices(
                     mvpMatrix,
@@ -36,6 +56,24 @@ public class Scene {
 
     public void setCamera(CameraGL camera){
         this.camera = camera;
+    }
+
+    public void setupBackground(){
+        background = buildPlane();
+        background.scale(1);
+
+    }
+    public void drawBackgroud(int aPositionLocation, int aColorLocation,int uMVPMatrixLocation){
+        gl.glDisable(GL_DEPTH_TEST);
+        Matrix.setIdentityM(mvpMatrix, 0);
+        MatrixHelper.multMatrices(
+                mvpMatrix,
+                background.getModelMatrix());
+        GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false, mvpMatrix, 0);
+        background.bindVertex(aPositionLocation);
+        background.bindColor(aColorLocation);
+        background.draw();
+        gl.glEnable(GL_DEPTH_TEST);
     }
 
     public void rotateScene(float[] angles){

@@ -60,7 +60,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         this.context = context;
         rotation = new float[]{0, 0, 0};
         translation = new float[]{0, 0, 0};
-        translation = new float[]{0, 0, 0};
         scale = 1;
         fpsCounter = new FPSCounter();
     }
@@ -72,10 +71,10 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
-        PlyParser plyP = new PlyParser(context, R.raw.very_low_res_model);
-        cube = buildCube();
+        PlyParser plyP = new PlyParser(context, R.raw.medium_res_example2);
         model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
-        scene = new Scene();
+        model.centerOnCentroid();
+        scene = new Scene(gl);
         scene.addModel(model);
     }
 

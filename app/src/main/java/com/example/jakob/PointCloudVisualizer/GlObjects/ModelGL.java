@@ -32,9 +32,7 @@ public abstract class ModelGL {
         mVertexBuffer = vertices;
         mVertexBuffer.position(0);
         initMatrices();
-        vertexCount = mVertexBuffer.capacity() / 4;
-        float[] centroid = getCentroid();
-        Matrix.translateM(centerMatrix, 0, -centroid[0], -centroid[1], -centroid[2]);
+        vertexCount = mVertexBuffer.capacity() / 3;
     }
 
     ModelGL(FloatBuffer vertices, FloatBuffer colors) {
@@ -110,6 +108,11 @@ public abstract class ModelGL {
         scaleMatrix[0]= scale;
         scaleMatrix[5]= scale;
         scaleMatrix[10]= scale;
+    }
+
+    public void centerOnCentroid(){
+        float[] centroid = getCentroid();
+        Matrix.translateM(centerMatrix, 0, -centroid[0], -centroid[1], -centroid[2]);
     }
 
     public abstract void draw();

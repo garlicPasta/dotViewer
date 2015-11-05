@@ -5,9 +5,6 @@ import android.opengl.Matrix;
 public class MatrixHelper {
 
     public static void multMatrices(float[] produktMatrix, float[]... matrices){
-        if (matrices.length <2 ){
-            throw new IllegalArgumentException("At least two matrcies have to be given");
-        }
         float[] tmp= new float[16];
         Matrix.setIdentityM(tmp, 0);
         for (int i= matrices.length - 1; i>=0; i--){

@@ -28,6 +28,6 @@ public class PolyIndexModelGL extends PolyModelGL{
     }
 
     public void draw() {
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, indices);
+        glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_BYTE, indices);
     }
 }
