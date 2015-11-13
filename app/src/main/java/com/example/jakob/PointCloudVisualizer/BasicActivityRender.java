@@ -9,6 +9,8 @@ import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
+import com.example.jakob.PointCloudVisualizer.util.NvmParser;
+import com.example.jakob.PointCloudVisualizer.util.Parser;
 import com.example.jakob.PointCloudVisualizer.util.PlyParser;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
 import com.example.jakob.PointCloudVisualizer.util.TextResourceReader;
@@ -25,7 +27,6 @@ import static android.opengl.GLES20.glFrontFace;
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
 import static android.opengl.GLES20.glUseProgram;
-import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildCube;
 
 
 public class BasicActivityRender implements GLSurfaceView.Renderer {
@@ -45,7 +46,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private PolyIndexModelGL cube;
     private FPSCounter fpsCounter;
 
-
     private int aPositionLocation;
     private int uMVPMatrix;
     public int aColorLocation;
@@ -53,7 +53,6 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private float[] rotation;
     private float[] translation;
     private float scale;
-
 
 
     public BasicActivityRender(Context context) {
@@ -71,7 +70,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
-        PlyParser plyP = new PlyParser(context, R.raw.medium_res_example2);
+        Parser plyP = new NvmParser(context, R.raw.model3);
         model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
         model.centerOnCentroid();
         scene = new Scene(gl);

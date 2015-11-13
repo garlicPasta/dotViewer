@@ -3,9 +3,6 @@ package com.example.jakob.PointCloudVisualizer.GlObjects;
 import android.opengl.Matrix;
 
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import static android.opengl.GLES20.glEnableVertexAttribArray;

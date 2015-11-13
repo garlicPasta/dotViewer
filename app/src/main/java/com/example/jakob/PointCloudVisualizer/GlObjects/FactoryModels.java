@@ -67,7 +67,7 @@ public class FactoryModels {
                 0.3f, 0.3f, 0.3f,
                 0f, 0f, 0f,
                 0f, 0f, 0f,
-                0.3f, 0.3f, 0.3f};
+                0.3f,0.3f, 0.3f};
 
         return new PolyModelGL(vertex, color);
     }

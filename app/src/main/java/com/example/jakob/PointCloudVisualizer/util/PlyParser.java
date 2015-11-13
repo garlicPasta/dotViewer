@@ -1,60 +1,30 @@
 package com.example.jakob.PointCloudVisualizer.util;
 
 import android.content.Context;
-import android.content.res.Resources;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
 
 
-public class PlyParser {
-
+public class PlyParser extends Parser {
 
     private enum State{
         Header, Vertices, Indices
     }
 
     private int propertyCounter;
-    private LinkedList<float[]> vertexes;
-    private FloatBuffer vertexBufferDirect;
-    private FloatBuffer colorBufferDirect;
     private LinkedList<float[]> indices;
     private State parserState = State.Header;
     private int verticesCounter;
     private int currentVerticesCounter;
 
-
     public PlyParser(Context context, int resourceId) {
+        super(context, resourceId);
         currentVerticesCounter = 0;
         propertyCounter = 0;
-        vertexes = new LinkedList<>();
-        indices = new LinkedList<>();
-
-        try {
-            InputStream is = context.getResources().openRawResource(resourceId);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader bufferedReader = new BufferedReader(isr);
-
-            String nextLine;
-
-            while ((nextLine = bufferedReader.readLine()) != null) {
-                parseLine(nextLine);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Could not open resource: " + resourceId, e);
-        } catch (Resources.NotFoundException nfe) {
-            throw new RuntimeException("Resource not found: " + resourceId, nfe);
-        }
     }
 
-    private void parseLine(String nextLine) {
-
+    protected void parseLine(String nextLine) {
         switch (parserState){
             case Header:
                 processHeaderLine(nextLine);
@@ -72,16 +42,7 @@ public class PlyParser {
     private void processHeaderLine(String nextLine){
             if (nextLine.contains("end_header")){
                 parserState = State.Vertices;
-
-                ByteBuffer byteBuf = ByteBuffer.allocateDirect(3 * 4 * verticesCounter);
-                byteBuf.order(ByteOrder.nativeOrder());
-                vertexBufferDirect = byteBuf.asFloatBuffer();
-                vertexBufferDirect.position(0);
-
-                byteBuf = ByteBuffer.allocateDirect(3 * 4 * verticesCounter);
-                byteBuf.order(ByteOrder.nativeOrder());
-                colorBufferDirect = byteBuf.asFloatBuffer();
-                colorBufferDirect.position(0);
+                createAttributeBuffer(verticesCounter);
             }else {
                 if (nextLine.contains("element vertex")) {
                     verticesCounter = Integer.valueOf(nextLine.split(" ")[2]);
@@ -118,14 +79,4 @@ public class PlyParser {
         }
         indices.add(listCoords);
     }
-
-    public FloatBuffer getVertexBuffer() {
-        return vertexBufferDirect;
-    }
-
-    public FloatBuffer getColorBuffer() {
-        return colorBufferDirect;
-    }
 }
-
-
