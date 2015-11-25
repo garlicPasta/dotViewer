@@ -11,7 +11,6 @@ import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
 import com.example.jakob.PointCloudVisualizer.util.NvmParser;
 import com.example.jakob.PointCloudVisualizer.util.Parser;
-import com.example.jakob.PointCloudVisualizer.util.PlyParser;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
 import com.example.jakob.PointCloudVisualizer.util.TextResourceReader;
 
@@ -70,7 +69,8 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
-        Parser plyP = new NvmParser(context, R.raw.model3);
+        // Use the ressource ID in the Parser Constructor
+        Parser plyP = new NvmParser(context, R.raw.model);
         model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
         model.centerOnCentroid();
         scene = new Scene(gl);
