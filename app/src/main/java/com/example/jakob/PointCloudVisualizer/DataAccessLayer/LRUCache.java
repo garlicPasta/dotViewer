@@ -9,7 +9,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.CacheNode;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,13 +17,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 public class LRUCache {
 
-    static int POINT_COUNT= 76;
-    static int BLOCK_COUNT= 1024;
+    static int POINT_COUNT= 100;
+    static int BLOCK_COUNT= 24000;
     static int FLOAT_SIZE= 4;
     static int BLOCK_SIZE= POINT_COUNT * FLOAT_SIZE * 3;
     static int BUFFER_SIZE= BLOCK_SIZE * (BLOCK_COUNT+1);
@@ -35,8 +32,8 @@ public class LRUCache {
 
     int capacity;
 
-    FloatBuffer vertexBuffer;
-    FloatBuffer colorBuffer;
+    public FloatBuffer vertexBuffer;
+    public FloatBuffer colorBuffer;
 
     HashMap<String, CacheNode> map = new HashMap<>();
     CacheNode head=null;
@@ -74,7 +71,7 @@ public class LRUCache {
         map.put(key, created);
     }
 
-    public void updateCache(String key, float[] vertices, float[] colors){
+    public synchronized void updateCache(String key, float[] vertices, float[] colors){
         set(key, vertices, colors, end.offset);
     }
 
@@ -143,7 +140,7 @@ public class LRUCache {
                             e.printStackTrace();
                         }
                         updateCache(key, vertices, colors);
-                        Log.d("Response", response.substring(0, 500));
+                        //Log.d("Response", response.substring(0, 500));
                     }
                 }, new Response.ErrorListener() {
 

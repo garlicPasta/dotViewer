@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -39,6 +40,19 @@ public abstract class Parser {
             throw new RuntimeException("Could not open resource: " + resourceId, e);
         } catch (Resources.NotFoundException nfe) {
             throw new RuntimeException("Resource not found: " + resourceId, nfe);
+        }
+    }
+
+    public Parser(String s){
+        BufferedReader br = new BufferedReader(new StringReader(s));
+        String line;
+        try {
+            while( (line=br.readLine()) != null )
+            {
+                parseLine(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
