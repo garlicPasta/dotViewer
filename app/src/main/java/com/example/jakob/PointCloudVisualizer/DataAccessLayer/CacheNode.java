@@ -15,6 +15,9 @@ public class CacheNode {
             this.offset= offset;
             vertexBuffer.position(offset);
             vertexBuffer.put(vertices);
+            colorBuffer.position(offset);
             colorBuffer.put(colors);
+            vertexBuffer.rewind();
+            colorBuffer.rewind();
         }
 }
