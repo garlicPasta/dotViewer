@@ -4,13 +4,17 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.ModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.RemoteModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
 import com.example.jakob.PointCloudVisualizer.util.NvmParser;
 import com.example.jakob.PointCloudVisualizer.util.Parser;
+import com.example.jakob.PointCloudVisualizer.util.PlyParser;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
 import com.example.jakob.PointCloudVisualizer.util.TextResourceReader;
 
@@ -41,7 +45,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private int mProgram;
 
     private Scene scene;
-    private PointModelGL model;
+    private RemoteModelGL model;
     private PolyIndexModelGL cube;
     private FPSCounter fpsCounter;
 
@@ -70,9 +74,11 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         glUseProgram(mProgram);
         receiveLocations();
         // Use the ressource ID in the Parser Constructor
-        Parser plyP = new NvmParser(context, R.raw.model3);
-        model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
-        model.centerOnCentroid();
+        //Parser plyP = new NvmParser(context, R.raw.model2);
+        //model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
+        // model.centerOnCentroid();
+        model = new RemoteModelGL(new LRUCache(context));
+        model.fetchData();
         scene = new Scene(gl);
         scene.addModel(model);
     }

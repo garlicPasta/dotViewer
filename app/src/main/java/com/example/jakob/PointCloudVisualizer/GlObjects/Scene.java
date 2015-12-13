@@ -2,21 +2,11 @@ package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
-
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.microedition.khronos.opengles.GL10;
-
-import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
-import static android.opengl.GLES20.GL_CCW;
-import static android.opengl.GLES20.GL_DELETE_STATUS;
-import static android.opengl.GLES20.GL_DEPTH_BITS;
 import static android.opengl.GLES20.GL_DEPTH_TEST;
-
-import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildBackground;
 import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildPlane;
 
 public class Scene {
@@ -35,7 +25,7 @@ public class Scene {
     }
 
     public void drawScene(int aPositionLocation, int aColorLocation, int uMVPMatrixLocation){
-        drawBackgroud(aPositionLocation, aColorLocation, uMVPMatrixLocation);
+        drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
         Matrix.setIdentityM(mvpMatrix, 0);
         for (ModelGL model : sceneModels){
             MatrixHelper.multMatrices(
@@ -63,7 +53,7 @@ public class Scene {
         background.scale(1);
 
     }
-    public void drawBackgroud(int aPositionLocation, int aColorLocation,int uMVPMatrixLocation){
+    public void drawBackground(int aPositionLocation, int aColorLocation, int uMVPMatrixLocation){
         gl.glDisable(GL_DEPTH_TEST);
         Matrix.setIdentityM(mvpMatrix, 0);
         MatrixHelper.multMatrices(
