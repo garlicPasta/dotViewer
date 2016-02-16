@@ -15,7 +15,7 @@ public class MatrixHelper {
         }
     }
 
-    public static float[] rotationMatrix(float rotX, float rotY, float rotZ){
+    public static float[] addRotationToMatrix(float rotX, float rotY, float rotZ){
         float[] mRotMatrixX = new float[16];
         float[] mRotMatrixY = new float[16];
         float[] mRotMatrix =  new float[16];
@@ -26,7 +26,7 @@ public class MatrixHelper {
         return mRotMatrix;
     }
 
-    public static void rotationMatrix(float[] rotMat, float[] rotation){
+    public static void addRotationToMatrix(float[] rotMat, float[] rotation){
         float[] mRotMatrixX = new float[16];
         float[] mRotMatrixY = new float[16];
         float[] mRotMatrixZ = new float[16];

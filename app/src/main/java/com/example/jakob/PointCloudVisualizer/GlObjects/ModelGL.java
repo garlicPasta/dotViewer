@@ -1,7 +1,6 @@
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 import android.opengl.Matrix;
-
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import java.nio.FloatBuffer;
 
@@ -10,11 +9,13 @@ import static android.opengl.GLES20.glVertexAttribPointer;
 import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.COLOR_COMPONENT_COUNT;
 import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.POSITION_COMPONENT_COUNT;
 import static android.opengl.GLES20.GL_FLOAT;
+import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.SIZE_COMPONENT_COUNT;
 import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildFloatBuffer;
 
 public abstract class ModelGL {
     protected FloatBuffer mVertexBuffer;
     private FloatBuffer mColorBuffer;
+    private FloatBuffer mSizeBuffer;
     private float scale;
     public int vertexCount;
 
@@ -36,6 +37,12 @@ public abstract class ModelGL {
         this(vertices);
         mColorBuffer = colors;
         mColorBuffer.position(0);
+    }
+
+    ModelGL(FloatBuffer vertices, FloatBuffer colors, FloatBuffer size) {
+        this(vertices, colors);
+        mSizeBuffer = size;
+        mSizeBuffer.position(0);
     }
 
     ModelGL(float[] vertices) {
@@ -72,6 +79,12 @@ public abstract class ModelGL {
         glEnableVertexAttribArray(aColorLocation);
     }
 
+    public void bindSize(int aSizeLocation){
+        glVertexAttribPointer(aSizeLocation, SIZE_COMPONENT_COUNT, GL_FLOAT,
+                false, 0, this.mSizeBuffer);
+        glEnableVertexAttribArray(aSizeLocation);
+    }
+
     public float[] getCentroid() {
         float[] centroid = {0, 0, 0};
         mVertexBuffer.rewind();
@@ -98,7 +111,7 @@ public abstract class ModelGL {
     }
 
     public void rotate(float[] angles){
-        MatrixHelper.rotationMatrix(rotationMatrix, angles);
+        MatrixHelper.addRotationToMatrix(rotationMatrix, angles);
     }
 
     public void scale(float scale){

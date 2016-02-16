@@ -24,12 +24,12 @@ import java.util.HashMap;
 public class LRUCache {
 
     static int POINT_COUNT= 1000;
-    static int BLOCK_COUNT= 352;
+    static int BLOCK_COUNT= 10;
     static int FLOAT_SIZE= 4;
     static int BLOCK_SIZE= POINT_COUNT * FLOAT_SIZE * 3;
-    static int BUFFER_SIZE= BLOCK_SIZE * (BLOCK_COUNT+1);
+    static int BUFFER_SIZE= BLOCK_SIZE * BLOCK_COUNT;
 
-    static String SERVER_IP= "http://192.168.2.102:8080/";
+    static String SERVER_IP= "192.168.2.102:8080";
     final int SERVER_PORT = 8080;
     private final RequestQueue queue;
 
@@ -37,6 +37,7 @@ public class LRUCache {
 
     public FloatBuffer vertexBuffer;
     public FloatBuffer colorBuffer;
+    public FloatBuffer sizeBuffer;
 
     HashMap<String, CacheNode> map = new HashMap<>();
     CacheNode head=null;
@@ -47,8 +48,9 @@ public class LRUCache {
         this.queue = Volley.newRequestQueue(context);
         createFloatBuffers();
         for (int i=0; i < capacity; i++){
-            setHead(new CacheNode(Integer.toString(i) + "foo", new float[3], new float[3],
-                    i * POINT_COUNT * 3, vertexBuffer, colorBuffer));
+            setHead(new CacheNode(Integer.toString(i) + "foo",
+                    new float[3], new float[3], new float[3],
+                    vertexBuffer, colorBuffer, sizeBuffer, i * POINT_COUNT * 3));
         }
     }
 
@@ -58,24 +60,24 @@ public class LRUCache {
             remove(n);
             setHead(n);
         }
-        receiveKey(key);
+        receiveNode(key);
     }
 
-    public void set(String key, float[] vertices, float[] colors, int offset) {
+    public void set(String key, float[] vertices, float[] colors, float[] size, int offset) {
         if(map.containsKey(key)) {
             CacheNode old = map.get(key);
             remove(old);
         }
-        CacheNode created = new CacheNode(key, vertices, colors,
-                offset, vertexBuffer, colorBuffer);
+        CacheNode created = new CacheNode(key, vertices, colors, size,
+                 vertexBuffer, colorBuffer, sizeBuffer, offset);
         map.remove(end.key);
         remove(end);
         setHead(created);
         map.put(key, created);
     }
 
-    public synchronized void updateCache(String key, float[] vertices, float[] colors){
-        set(key, vertices, colors, end.offset);
+    public synchronized void updateCache(String key, float[] vertices, float[] colors, float[] size){
+        set(key, vertices, colors, size, end.offset);
     }
 
     private void remove(CacheNode n){
@@ -114,7 +116,13 @@ public class LRUCache {
         byteBuf.order(ByteOrder.nativeOrder());
         colorBuffer = byteBuf.asFloatBuffer();
         colorBuffer.position(0);
+
+        byteBuf = ByteBuffer.allocateDirect(BUFFER_SIZE / 3);
+        byteBuf.order(ByteOrder.nativeOrder());
+        sizeBuffer = byteBuf.asFloatBuffer();
+        sizeBuffer.position(0);
     }
+
     private class PointRequest extends StringRequest{
         private String key;
 
@@ -136,9 +144,12 @@ public class LRUCache {
             String line;
 
             float[] vertices = new float[3 * POINT_COUNT];
-            float[] colors= new float[3 * POINT_COUNT];
+            float[] colors = new float[3 * POINT_COUNT];
+            float[] size = new float[POINT_COUNT];
+
             int i = 0;
             int j = 0;
+            int k = 0;
 
             try {
                 while( (line=bufReader.readLine()) != null ) {
@@ -149,30 +160,37 @@ public class LRUCache {
                     colors[j++] = Float.parseFloat(responseArray[3]);
                     colors[j++] = Float.parseFloat(responseArray[4]);
                     colors[j++] = Float.parseFloat(responseArray[5]);
+                    size[k++] = Float.parseFloat(responseArray[6]);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            updateCache(key, vertices, colors);
+            updateCache(key, vertices, colors, size);
             //Log.d("Response", response.substring(0, 500));
             return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
         }
     }
 
-    private void receiveKey(final String key) {
-        String url =SERVER_IP + "?key=" + key;
-        final StringRequest sR = new PointRequest(Request.Method.GET,url,
+    private void receiveNode(final String query) {
+        final StringRequest sR = new PointRequest(Request.Method.GET, query,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("Volley ","Receive Request for " + key);
+                        Log.d("Volley ","Receive Request for " + query);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley ","Error for request");
             }
-        },key);
+        }, query);
         this.queue.add(sR);
     }
+
+    public void rewindAllBuffer(){
+        this.vertexBuffer.rewind();
+        this.colorBuffer.rewind();
+        this.sizeBuffer.rewind();
+    }
+
 }

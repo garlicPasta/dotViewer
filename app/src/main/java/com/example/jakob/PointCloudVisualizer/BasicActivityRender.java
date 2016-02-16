@@ -3,18 +3,14 @@ package com.example.jakob.PointCloudVisualizer;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.SystemClock;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.ModelGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.RemoteModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
-import com.example.jakob.PointCloudVisualizer.util.NvmParser;
-import com.example.jakob.PointCloudVisualizer.util.Parser;
-import com.example.jakob.PointCloudVisualizer.util.PlyParser;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
 import com.example.jakob.PointCloudVisualizer.util.TextResourceReader;
 
@@ -37,10 +33,12 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
 
     private static final String A_POSITION = "a_Position";
     private static final String A_COLOR = "a_Color";
+    private static final String A_SIZE = "a_Size";
     private static final String U_MATRIX = "u_Matrix";
 
     public static final int COLOR_COMPONENT_COUNT = 3;
     public static final int POSITION_COMPONENT_COUNT = 3;
+    public static final int SIZE_COMPONENT_COUNT = 1;
 
     private int mProgram;
 
@@ -50,8 +48,9 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private FPSCounter fpsCounter;
 
     private int aPositionLocation;
-    private int uMVPMatrix;
+    private int uMVPMatrixLocation;
     public int aColorLocation;
+    public int aSizeLocation;
 
     private float[] rotation;
     private float[] translation;
@@ -69,7 +68,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-        gl.glEnable(GL_DEPTH_TEST);
+        //gl.glEnable(GL_DEPTH_TEST);
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
@@ -83,10 +82,11 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         scene.addModel(model);
     }
 
-    public void receiveLocations(){
+    private void receiveLocations(){
         aPositionLocation = glGetAttribLocation(mProgram, A_POSITION);
         aColorLocation = glGetAttribLocation(mProgram, A_COLOR);
-        uMVPMatrix = glGetUniformLocation(mProgram, U_MATRIX);
+        aSizeLocation = glGetAttribLocation(mProgram, A_SIZE);
+        uMVPMatrixLocation = glGetUniformLocation(mProgram, U_MATRIX);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BITS);
         glFrontFace(GL_CCW);
-        scene.drawScene(aPositionLocation, aColorLocation, uMVPMatrix);
+        scene.drawScene(aPositionLocation, aColorLocation, aSizeLocation, uMVPMatrixLocation);
         fpsCounter.logFrame();
     }
 

@@ -15,6 +15,6 @@ public class CameraGL {
     }
 
     public void rotate(float[] angle){
-        MatrixHelper.rotationMatrix(viewMatrix, angle);
+        MatrixHelper.addRotationToMatrix(viewMatrix, angle);
     }
 }

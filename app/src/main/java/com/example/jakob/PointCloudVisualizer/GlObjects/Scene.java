@@ -24,18 +24,20 @@ public class Scene {
         mvpMatrix = new float[16];
     }
 
-    public void drawScene(int aPositionLocation, int aColorLocation, int uMVPMatrixLocation){
+    public void drawScene(int aPositionLocation, int aColorLocation, int aSizeLocation,
+                          int uMVPMatrixLocation){
         drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
-        Matrix.setIdentityM(mvpMatrix, 0);
         for (ModelGL model : sceneModels){
+            Matrix.setIdentityM(mvpMatrix, 0);
             MatrixHelper.multMatrices(
                     mvpMatrix,
                     camera.projectionMatrix,
                     camera.viewMatrix,
                     model.getModelMatrix());
-            GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false,mvpMatrix, 0);
+            GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false, mvpMatrix, 0);
             model.bindVertex(aPositionLocation);
             model.bindColor(aColorLocation);
+            model.bindSize(aSizeLocation);
             model.draw();
         }
     }
@@ -54,7 +56,6 @@ public class Scene {
 
     }
     public void drawBackground(int aPositionLocation, int aColorLocation, int uMVPMatrixLocation){
-        gl.glDisable(GL_DEPTH_TEST);
         Matrix.setIdentityM(mvpMatrix, 0);
         MatrixHelper.multMatrices(
                 mvpMatrix,
@@ -63,7 +64,6 @@ public class Scene {
         background.bindVertex(aPositionLocation);
         background.bindColor(aColorLocation);
         background.draw();
-        gl.glEnable(GL_DEPTH_TEST);
     }
 
     public void rotateScene(float[] angles){
