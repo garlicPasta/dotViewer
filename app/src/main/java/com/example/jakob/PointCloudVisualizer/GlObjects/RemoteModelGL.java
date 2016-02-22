@@ -13,18 +13,16 @@ public class RemoteModelGL extends ModelGL{
     public RemoteModelGL(LRUCache cache) {
         super(cache.vertexBuffer, cache.colorBuffer, cache.sizeBuffer);
         dataAcces = cache;
-        vertexCount = 0;
     }
 
     public void fetchData(){
-        int depth = 1;
-        int node = 1;
-        for (int page = 0; page < 10 ; page++) {
+        int depth = 2;
+        int node = 6;
+        int maxPage = 2;
+        for (int page = 0; page <= maxPage ; page++) {
             final String query = buildQuery(Integer.toString(depth), Integer.toString(node),
                     Integer.toString(page));
             dataAcces.get(query);
-            vertexCount += 1000;
-
         }
         centerOnCentroid();
     }

@@ -24,7 +24,7 @@ import java.util.HashMap;
 public class LRUCache {
 
     static int POINT_COUNT= 1000;
-    static int BLOCK_COUNT= 10;
+    static int BLOCK_COUNT= 2;
     static int FLOAT_SIZE= 4;
     static int BLOCK_SIZE= POINT_COUNT * FLOAT_SIZE * 3;
     static int BUFFER_SIZE= BLOCK_SIZE * BLOCK_COUNT;
@@ -32,8 +32,6 @@ public class LRUCache {
     static String SERVER_IP= "192.168.2.102:8080";
     final int SERVER_PORT = 8080;
     private final RequestQueue queue;
-
-    int capacity;
 
     public FloatBuffer vertexBuffer;
     public FloatBuffer colorBuffer;
@@ -44,13 +42,17 @@ public class LRUCache {
     CacheNode end=null;
 
     public LRUCache(Context context) {
-        this.capacity = BLOCK_COUNT;
         this.queue = Volley.newRequestQueue(context);
         createFloatBuffers();
-        for (int i=0; i < capacity; i++){
+        for (int i=0; i < BLOCK_COUNT; i++){
             setHead(new CacheNode(Integer.toString(i) + "foo",
-                    new float[3], new float[3], new float[3],
+                    new float[3000], new float[3000], new float[1000],
                     vertexBuffer, colorBuffer, sizeBuffer, i * POINT_COUNT * 3));
+        }
+
+        for (int i=0; i <= BLOCK_COUNT *2; i++){
+            updateCache(Integer.toString(i) + "bar",
+                    new float[POINT_COUNT * 3], new float[POINT_COUNT * 3], new float[POINT_COUNT]);
         }
     }
 
@@ -157,7 +159,7 @@ public class LRUCache {
                     vertices[i++] = Float.parseFloat(responseArray[0]);
                     vertices[i++] = Float.parseFloat(responseArray[1]);
                     vertices[i++] = Float.parseFloat(responseArray[2]);
-                    colors[j++] = Float.parseFloat(responseArray[3]);
+                    colors[j++] =  Float.parseFloat(responseArray[3]);
                     colors[j++] = Float.parseFloat(responseArray[4]);
                     colors[j++] = Float.parseFloat(responseArray[5]);
                     size[k++] = Float.parseFloat(responseArray[6]);
