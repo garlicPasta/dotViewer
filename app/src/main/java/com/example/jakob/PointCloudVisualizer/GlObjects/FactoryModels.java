@@ -63,11 +63,11 @@ public class FactoryModels {
 
         float[] color = {
                 0f, 0f, 0f,
-                0.3f, 0.0f, 0.0f,
-                0.3f, 0.0f, 0.0f,
+                255 * 0.3f, 0.0f, 0.0f,
+                255 * 0.3f, 0.0f, 0.0f,
                 0f, 0f, 0f,
                 0f, 0f, 0f,
-                0.3f,0.0f, 0.0f};
+                255 * 0.3f,0.0f, 0.0f};
 
         return new PolyModelGL(vertex, color);
     }

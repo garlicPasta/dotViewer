@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 
 
 public class BasicActivity extends ActionBarActivity {
@@ -19,9 +18,8 @@ public class BasicActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        glSurfaceView = new BasicAcitivtySurfaceView(this);
+        glSurfaceView = new GLRenderSurfaceView(this);
         setContentView(glSurfaceView);
-        LRUCache cache = new LRUCache(this);
     }
 
     @Override

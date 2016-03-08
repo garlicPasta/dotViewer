@@ -1,0 +1,13 @@
+package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
+
+option java_outer_classname = "RasterProtos";
+
+message Raster{
+    repeated Point3DRGB sample = 1;
+
+    message Point3DRGB{
+        repeated float position = 1;
+        repeated float color = 2;
+        required int32 size = 3;
+    }
+}

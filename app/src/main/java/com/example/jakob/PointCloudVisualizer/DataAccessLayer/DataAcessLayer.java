@@ -1,6 +1,5 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -10,17 +9,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.jakob.PointCloudVisualizer.util.NvmParser;
-import com.example.jakob.PointCloudVisualizer.util.Parser;
 
-import org.apache.http.HttpClientConnection;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class DataAcessLayer {
-    final int SERVER_PORT= 8080;
-    final String SERVER_IP= "http://192.168.2.102:8080";
+    public static final int SERVER_PORT= 8080;
+    public static final String SERVER_IP= "192.168.2.102:8080";
+
     RequestQueue queue;
     Context c;
     HashMap<String,String> cache;
@@ -44,5 +40,13 @@ public class DataAcessLayer {
             }
         });
         this.queue.add(sR);
+    }
+
+    public LRUCache buildLRUCache(){
+        return new LRUCache(queue);
+    };
+
+    public MultiResTreeProtos buildMultiResTreeProtos() {
+
     }
 }

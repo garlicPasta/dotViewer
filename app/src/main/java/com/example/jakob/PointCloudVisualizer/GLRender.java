@@ -3,8 +3,8 @@ package com.example.jakob.PointCloudVisualizer;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.os.SystemClock;
 
+import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
@@ -28,7 +28,7 @@ import static android.opengl.GLES20.glGetUniformLocation;
 import static android.opengl.GLES20.glUseProgram;
 
 
-public class BasicActivityRender implements GLSurfaceView.Renderer {
+public class GLRender implements GLSurfaceView.Renderer {
     private final Context context;
 
     private static final String A_POSITION = "a_Position";
@@ -46,6 +46,7 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private RemoteModelGL model;
     private PolyIndexModelGL cube;
     private FPSCounter fpsCounter;
+    private DataAcessLayer dal;
 
     private int aPositionLocation;
     private int uMVPMatrixLocation;
@@ -57,8 +58,9 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
     private float scale;
 
 
-    public BasicActivityRender(Context context) {
+    public GLRender(Context context, DataAcessLayer dal) {
         this.context = context;
+        this.dal = dal;
         rotation = new float[]{0, 0, 0};
         translation = new float[]{0, 0, 0};
         scale = 1;
@@ -76,8 +78,13 @@ public class BasicActivityRender implements GLSurfaceView.Renderer {
         //Parser plyP = new NvmParser(context, R.raw.model2);
         //model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
         // model.centerOnCentroid();
-        model = new RemoteModelGL(new LRUCache(context));
-        model.fetchData();
+        model = new RemoteModelGL(dal.buildLRUCache());
+        String[] keys = {
+                "-31.50016.50024.500",
+                "32.50016.50088.500"
+        };
+        for (String key: keys)
+            model.fetchData(key);
         scene = new Scene(gl);
         scene.addModel(model);
     }

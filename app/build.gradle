@@ -23,9 +23,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile group: 'com.google.guava', name: 'guava', version: '12.0'
-    compile 'com.mcxiaoke.volley:library-aar:1.0.0'
+    compile(
+            fileTree(dir: 'libs', include: ['*.jar']),
+            'com.android.support:appcompat-v7:22.2.1',
+            'com.mcxiaoke.volley:library-aar:1.0.0',
+            [group: 'com.google.guava', name: 'guava', version: '12.0'],
+            'com.google.protobuf:protobuf-java:3.0.0-beta-2',
+    )
     androidTestCompile 'junit:junit:4.12'
 }

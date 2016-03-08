@@ -22,7 +22,7 @@ public class PolyModelGL extends ModelGL{
     }
 
     public void draw() {
-        glDrawArrays(GL_TRIANGLES, 0 , vertexCount);
+        glDrawArrays(GL_TRIANGLES, 0 , getVertexCount());
     }
 
 }

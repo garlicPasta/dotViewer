@@ -12,10 +12,12 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.Toast;
 
-public class BasicAcitivtySurfaceView extends GLSurfaceView  {
+import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
+
+public class GLRenderSurfaceView extends GLSurfaceView  {
 
     private static final String DEBUG_TAG = "Gesture";
-    private final BasicActivityRender mRenderer;
+    private final GLRender mRenderer;
     private float mScaleFactor;
     private boolean renderSet;
     private GestureDetectorCompat mDetector;
@@ -31,12 +33,12 @@ public class BasicAcitivtySurfaceView extends GLSurfaceView  {
     }
 
 
-    public BasicAcitivtySurfaceView(Context context) {
+    public GLRenderSurfaceView(Context context) {
         super(context);
         mScaleFactor = 1;
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
-        mRenderer = new BasicActivityRender(context);
+        mRenderer = new GLRender(context, new DataAcessLayer(context));
         if (supportsEs2(context)) {
             setEGLContextClientVersion(2);
             renderSet = true;

@@ -1,6 +1,5 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.NetworkResponse;
@@ -9,13 +8,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -23,26 +17,25 @@ import java.util.HashMap;
 
 public class LRUCache {
 
-    static int POINT_COUNT= 1000;
-    static int BLOCK_COUNT= 2;
-    static int FLOAT_SIZE= 4;
-    static int BLOCK_SIZE= POINT_COUNT * FLOAT_SIZE * 3;
-    static int BUFFER_SIZE= BLOCK_SIZE * BLOCK_COUNT;
+    static int POINT_COUNT = 10000;
+    static int BLOCK_COUNT = 20;
+    static int FLOAT_SIZE = 4;
+    static int BLOCK_SIZE = POINT_COUNT * FLOAT_SIZE * 3;
+    static int BUFFER_SIZE = BLOCK_SIZE * BLOCK_COUNT;
 
-    static String SERVER_IP= "192.168.2.102:8080";
-    final int SERVER_PORT = 8080;
     private final RequestQueue queue;
 
     public FloatBuffer vertexBuffer;
     public FloatBuffer colorBuffer;
     public FloatBuffer sizeBuffer;
+    public int vertexCount;
 
     HashMap<String, CacheNode> map = new HashMap<>();
     CacheNode head=null;
     CacheNode end=null;
 
-    public LRUCache(Context context) {
-        this.queue = Volley.newRequestQueue(context);
+    public LRUCache(RequestQueue queue) {
+        this.queue = queue;
         createFloatBuffers();
         for (int i=0; i < BLOCK_COUNT; i++){
             setHead(new CacheNode(Integer.toString(i) + "foo",
@@ -125,67 +118,60 @@ public class LRUCache {
         sizeBuffer.position(0);
     }
 
-    private class PointRequest extends StringRequest{
+    private class PointRequest extends Request<RasterProtos.Raster>{
         private String key;
 
-        public PointRequest(int method, String url, Response.Listener<String> listener,
+        public PointRequest(int method, String url,
                             Response.ErrorListener errorListener, String key) {
-            super(method, url, listener, errorListener);
+            super(method, url, errorListener);
             this.key = key;
         }
 
         @Override
-        protected Response parseNetworkResponse(NetworkResponse response) {
-            String parsed;
+        protected Response<RasterProtos.Raster> parseNetworkResponse(NetworkResponse response) {
+            RasterProtos.Raster raster = null;
             try {
-                parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-            } catch (UnsupportedEncodingException e) {
-                parsed = new String(response.data);
+                raster = RasterProtos.Raster.parseFrom(response.data);
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
             }
-            BufferedReader bufReader = new BufferedReader(new StringReader(parsed));
-            String line;
 
             float[] vertices = new float[3 * POINT_COUNT];
             float[] colors = new float[3 * POINT_COUNT];
             float[] size = new float[POINT_COUNT];
 
-            int i = 0;
             int j = 0;
             int k = 0;
 
-            try {
-                while( (line=bufReader.readLine()) != null ) {
-                    String[] responseArray = line.split(" ");
-                    vertices[i++] = Float.parseFloat(responseArray[0]);
-                    vertices[i++] = Float.parseFloat(responseArray[1]);
-                    vertices[i++] = Float.parseFloat(responseArray[2]);
-                    colors[j++] =  Float.parseFloat(responseArray[3]);
-                    colors[j++] = Float.parseFloat(responseArray[4]);
-                    colors[j++] = Float.parseFloat(responseArray[5]);
-                    size[k++] = Float.parseFloat(responseArray[6]);
+            for (RasterProtos.Raster.Point3DRGB p : raster.getSampleList()) {
+                for (int i = 0; i < 3; i++) {
+                    vertices[j] = p.getPosition(i);
+                    colors[j++] = p.getColor(i);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                size[k++] = p.getSize();
             }
             updateCache(key, vertices, colors, size);
+            vertexCount += j;
             //Log.d("Response", response.substring(0, 500));
-            return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(raster, HttpHeaderParser.parseCacheHeaders(response));
+        }
+
+        @Override
+        protected void deliverResponse(RasterProtos.Raster response) {
+            Log.d("Volley ","Receive Request for " + key);
         }
     }
 
-    private void receiveNode(final String query) {
-        final StringRequest sR = new PointRequest(Request.Method.GET, query,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("Volley ","Receive Request for " + query);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley ","Error for request");
-            }
-        }, query);
+    private void receiveNode(final String id) {
+        final PointRequest sR = new PointRequest(
+                Request.Method.GET,
+                QueryFactory.buildSampleQuery(id).toString(),
+                new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("Volley ","Error for request");
+                }
+        }, id);
         this.queue.add(sR);
     }
 
@@ -194,5 +180,4 @@ public class LRUCache {
         this.colorBuffer.rewind();
         this.sizeBuffer.rewind();
     }
-
 }

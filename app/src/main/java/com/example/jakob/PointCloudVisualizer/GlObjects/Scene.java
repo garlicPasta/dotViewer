@@ -6,7 +6,6 @@ import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import java.util.LinkedList;
 import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
-import static android.opengl.GLES20.GL_DEPTH_TEST;
 import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildPlane;
 
 public class Scene {
@@ -28,12 +27,14 @@ public class Scene {
                           int uMVPMatrixLocation){
         drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
         for (ModelGL model : sceneModels){
+            model.centerOnCentroid();
             Matrix.setIdentityM(mvpMatrix, 0);
             MatrixHelper.multMatrices(
                     mvpMatrix,
                     camera.projectionMatrix,
                     camera.viewMatrix,
-                    model.getModelMatrix());
+                    model.getModelMatrix(),
+                    model.centerMatrix);
             GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false, mvpMatrix, 0);
             model.bindVertex(aPositionLocation);
             model.bindColor(aColorLocation);
@@ -53,8 +54,8 @@ public class Scene {
     public void setupBackground(){
         background = buildPlane();
         background.scale(1);
-
     }
+
     public void drawBackground(int aPositionLocation, int aColorLocation, int uMVPMatrixLocation){
         Matrix.setIdentityM(mvpMatrix, 0);
         MatrixHelper.multMatrices(

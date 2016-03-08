@@ -22,6 +22,6 @@ public class PointModelGL extends ModelGL {
     }
 
     public void draw() {
-        glDrawArrays(GL_POINTS, 0 , vertexCount);
+        glDrawArrays(GL_POINTS, 0 , getVertexCount());
     }
 }

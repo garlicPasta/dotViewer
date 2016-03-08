@@ -1,15 +1,16 @@
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 import android.opengl.Matrix;
+
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import java.nio.FloatBuffer;
 
 import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glVertexAttribPointer;
-import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.COLOR_COMPONENT_COUNT;
-import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.POSITION_COMPONENT_COUNT;
+import static com.example.jakob.PointCloudVisualizer.GLRender.COLOR_COMPONENT_COUNT;
+import static com.example.jakob.PointCloudVisualizer.GLRender.POSITION_COMPONENT_COUNT;
 import static android.opengl.GLES20.GL_FLOAT;
-import static com.example.jakob.PointCloudVisualizer.BasicActivityRender.SIZE_COMPONENT_COUNT;
+import static com.example.jakob.PointCloudVisualizer.GLRender.SIZE_COMPONENT_COUNT;
 import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildFloatBuffer;
 
 public abstract class ModelGL {
@@ -17,7 +18,7 @@ public abstract class ModelGL {
     private FloatBuffer mColorBuffer;
     private FloatBuffer mSizeBuffer;
     private float scale;
-    public int vertexCount;
+    private int vertexCount;
 
     float[] modelMatrix;
     float[] transMatrix;
@@ -30,7 +31,6 @@ public abstract class ModelGL {
         mVertexBuffer = vertices;
         mVertexBuffer.position(0);
         initMatrices();
-        vertexCount = mVertexBuffer.capacity() / 3;
     }
 
     ModelGL(FloatBuffer vertices, FloatBuffer colors) {
@@ -66,7 +66,6 @@ public abstract class ModelGL {
         Matrix.scaleM(scaleMatrix, 0, scale, scale, scale);
     }
 
-
     public void bindVertex(int aPositionLocation){
         glVertexAttribPointer(aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT,
                 false, 0, this.mVertexBuffer);
@@ -88,14 +87,14 @@ public abstract class ModelGL {
     public float[] getCentroid() {
         float[] centroid = {0, 0, 0};
         mVertexBuffer.rewind();
-        while (mVertexBuffer.hasRemaining()) {
+        for (int i = 0; i < getVertexCount(); i++) {
             centroid[0] += mVertexBuffer.get();
             centroid[1] += mVertexBuffer.get();
             centroid[2] += mVertexBuffer.get();
         }
-        centroid[0] /= vertexCount;
-        centroid[1] /= vertexCount;
-        centroid[2] /= vertexCount;
+        centroid[0] /= getVertexCount();
+        centroid[1] /= getVertexCount();
+        centroid[2] /= getVertexCount();
         mVertexBuffer.rewind();
         return centroid;
     }
@@ -122,8 +121,13 @@ public abstract class ModelGL {
 
     public void centerOnCentroid(){
         float[] centroid = getCentroid();
+        Matrix.setIdentityM(centerMatrix, 0);
         Matrix.translateM(centerMatrix, 0, -centroid[0], -centroid[1], -centroid[2]);
     }
 
     public abstract void draw();
+
+    public int getVertexCount() {
+        return vertexCount;
+    }
 }
