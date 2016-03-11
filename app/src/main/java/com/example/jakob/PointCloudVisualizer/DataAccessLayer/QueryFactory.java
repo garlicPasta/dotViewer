@@ -2,11 +2,6 @@ package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import android.net.Uri;
 
-import java.net.URI;
-
-/**
- * Created by jakob on 2/25/16.
- */
 public class QueryFactory {
 
     public static Uri buildMRTQuery(){

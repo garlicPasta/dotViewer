@@ -1,7 +1,6 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import android.util.Log;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
