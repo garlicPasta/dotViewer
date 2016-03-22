@@ -5,8 +5,8 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.OctreeWireGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.RemoteModelGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
@@ -20,7 +20,6 @@ import javax.microedition.khronos.opengles.GL10;
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_CCW;
 import static android.opengl.GLES20.GL_DEPTH_BITS;
-import static android.opengl.GLES20.GL_DEPTH_TEST;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glFrontFace;
 import static android.opengl.GLES20.glGetAttribLocation;
@@ -74,19 +73,20 @@ public class GLRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
+        scene = new Scene(gl);
+        dal.setScene(scene);
         // Use the ressource ID in the Parser Constructor
         //Parser plyP = new NvmParser(context, R.raw.model2);
         //model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
         // model.centerOnCentroid();
         model = new RemoteModelGL(dal.buildLRUCache());
         String[] keys = {
-                "-31.50016.50024.500",
-                "32.50016.50088.500"
+                "0.500-15.50056.500"
         };
         for (String key: keys)
             model.fetchData(key);
-        scene = new Scene(gl);
         scene.addModel(model);
+        dal.buildMultiResTreeProtos();
     }
 
     private void receiveLocations(){

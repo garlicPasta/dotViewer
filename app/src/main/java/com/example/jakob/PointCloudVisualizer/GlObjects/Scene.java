@@ -8,6 +8,7 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
 import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.buildPlane;
 
+
 public class Scene {
     List<ModelGL> sceneModels;
     PolyModelGL background;
@@ -23,11 +24,10 @@ public class Scene {
         mvpMatrix = new float[16];
     }
 
-    public void drawScene(int aPositionLocation, int aColorLocation, int aSizeLocation,
-                          int uMVPMatrixLocation){
+    public void drawScene(int aPositionLocation, int aColorLocation,
+                          int aSizeLocation, int uMVPMatrixLocation){
         drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
         for (ModelGL model : sceneModels){
-            model.centerOnCentroid();
             Matrix.setIdentityM(mvpMatrix, 0);
             MatrixHelper.multMatrices(
                     mvpMatrix,
@@ -38,13 +38,17 @@ public class Scene {
             GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false, mvpMatrix, 0);
             model.bindVertex(aPositionLocation);
             model.bindColor(aColorLocation);
-            model.bindSize(aSizeLocation);
+            //model.bindSize(aSizeLocation);
             model.draw();
         }
     }
 
-    public void addModel(ModelGL modelGL){
-        sceneModels.add(modelGL);
+    public void addModel(ModelGL models){
+        sceneModels.add(models);
+    }
+
+    public void addModels(List<OctreeWireGL.BoxGL> models){
+        sceneModels.addAll(models);
     }
 
     public void setCamera(CameraGL camera){
@@ -68,11 +72,12 @@ public class Scene {
     }
 
     public void rotateScene(float[] angles){
-        //this.camera.rotate(angles);
-        sceneModels.get(0).rotate(angles);
+        for (ModelGL m : sceneModels)
+            m.rotate(angles);
     }
 
     public void scaleScene(float scale){
-        sceneModels.get(0).scale(scale);
+        for (ModelGL m : sceneModels)
+            m.scale(scale);
     }
 }

@@ -7,18 +7,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.example.jakob.PointCloudVisualizer.GlObjects.OctreeWireGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 
 public class MRTRequest {
-    private RequestQueue rQ;
 
-
-    public MRTRequest(RequestQueue rQ) {
-        this.rQ = rQ;
-    }
-
-    public void sendRequest(){
+    static public void sendRequest(RequestQueue rQ, Scene s){
         ProtoRequest request = new ProtoRequest(Request.Method.GET,
                 QueryFactory.buildMRTQuery().toString(),
                 new Response.ErrorListener() {
@@ -26,14 +22,16 @@ public class MRTRequest {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Error", "ProtoRequest failed");
                     }
-                });
+                }, s);
         rQ.add(request);
     }
 
-    class ProtoRequest extends Request<MultiResTreeProtos.MRTree> {
+    static class ProtoRequest extends Request<MultiResTreeProtos.MRTree> {
+        Scene scene;
 
-        public ProtoRequest(int method, String url, Response.ErrorListener listener) {
+        public ProtoRequest(int method, String url, Response.ErrorListener listener, Scene s) {
             super(method, url, listener);
+            scene = s;
         }
 
         @Override
@@ -49,7 +47,8 @@ public class MRTRequest {
 
         @Override
         protected void deliverResponse(MultiResTreeProtos.MRTree tree) {
-
+            OctreeWireGL octree = new OctreeWireGL(tree);
+            scene.addModels(octree.exportOctreeBoxes());
         }
     }
 }

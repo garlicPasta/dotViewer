@@ -1,9 +1,7 @@
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
-import android.net.Uri;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.QueryFactory;
 
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.GL_POINTS;

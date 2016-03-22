@@ -2,6 +2,7 @@ package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 import android.opengl.Matrix;
 
+import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import java.nio.FloatBuffer;
 
@@ -15,7 +16,7 @@ import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildFloa
 
 public abstract class ModelGL {
     protected FloatBuffer mVertexBuffer;
-    private FloatBuffer mColorBuffer;
+    protected FloatBuffer mColorBuffer;
     private FloatBuffer mSizeBuffer;
     private float scale;
     private int vertexCount;
@@ -30,7 +31,17 @@ public abstract class ModelGL {
         scale = 1;
         mVertexBuffer = vertices;
         mVertexBuffer.position(0);
+        if (mColorBuffer == null)
+            mColorBuffer = BufferHelper.buildFloatBuffer(new float[vertices.capacity()]);
+        if (mSizeBuffer == null) {
+            float[] fb = new float[vertices.capacity()/3];
+            for (int i = 0; i < fb.length; i++) {
+                fb[i] = 1;
+            }
+            mSizeBuffer = BufferHelper.buildFloatBuffer(fb);
+        }
         initMatrices();
+        vertexCount = vertices.capacity() / 3;
     }
 
     ModelGL(FloatBuffer vertices, FloatBuffer colors) {
@@ -128,6 +139,6 @@ public abstract class ModelGL {
     public abstract void draw();
 
     public int getVertexCount() {
-        return vertexCount;
+        return mVertexBuffer.capacity() / 3;
     }
 }

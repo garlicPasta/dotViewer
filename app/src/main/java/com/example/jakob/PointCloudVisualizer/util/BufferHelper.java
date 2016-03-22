@@ -16,6 +16,23 @@ public class BufferHelper {
         return buffer;
     }
 
+    public static FloatBuffer buildFloatBuffer(float[] array){
+        ByteBuffer byteBuf = ByteBuffer.allocateDirect(array.length * 4);
+        byteBuf.order(ByteOrder.nativeOrder());
+        FloatBuffer buffer = byteBuf.asFloatBuffer();
+        buffer.put(array);
+        buffer.position(0);
+        return buffer;
+    }
+
+    public static FloatBuffer buildFloatBuffer(int size){
+        ByteBuffer byteBuf = ByteBuffer.allocateDirect(size * 4);
+        byteBuf.order(ByteOrder.nativeOrder());
+        FloatBuffer buffer = byteBuf.asFloatBuffer();
+        buffer.position(0);
+        return buffer;
+    }
+
     public static ShortBuffer buildShortBuffer(short[] array) {
         ByteBuffer byteBuf = ByteBuffer.allocateDirect(array.length * 2);
         byteBuf.order(ByteOrder.nativeOrder());
