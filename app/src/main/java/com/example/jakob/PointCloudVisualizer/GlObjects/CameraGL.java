@@ -11,7 +11,7 @@ public class CameraGL {
         viewMatrix = new float[16];
         projectionMatrix = new float[16];
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -100.0f, 0f, 0f, 1f, 0f, 1.0f, 0.0f);
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 20000);
+        Matrix.orthoM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 20000);
     }
 
     public void rotate(float[] angle){

@@ -11,6 +11,8 @@ import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.bui
 
 public class Scene {
     List<ModelGL> sceneModels;
+    RemotePointClusterGL pointCluster;
+    OctreeWireGL octree;
     PolyModelGL background;
     CameraGL camera;
     GL10 gl;
@@ -27,7 +29,8 @@ public class Scene {
     public void drawScene(int aPositionLocation, int aColorLocation,
                           int aSizeLocation, int uMVPMatrixLocation){
         drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
-        for (ModelGL model : sceneModels){
+        for (int i = 0; i < sceneModels.size(); i++) {
+            ModelGL model = sceneModels.get(i);
             Matrix.setIdentityM(mvpMatrix, 0);
             MatrixHelper.multMatrices(
                     mvpMatrix,
@@ -38,17 +41,19 @@ public class Scene {
             GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false, mvpMatrix, 0);
             model.bindVertex(aPositionLocation);
             model.bindColor(aColorLocation);
-            //model.bindSize(aSizeLocation);
+            model.bindSize(aSizeLocation);
             model.draw();
         }
     }
 
-    public void addModel(ModelGL models){
+    public synchronized void addModel(ModelGL models){
         sceneModels.add(models);
     }
 
     public void addModels(List<OctreeWireGL.BoxGL> models){
-        sceneModels.addAll(models);
+        for (ModelGL model : models){
+            addModel(model);
+        }
     }
 
     public void setCamera(CameraGL camera){
@@ -79,5 +84,18 @@ public class Scene {
     public void scaleScene(float scale){
         for (ModelGL m : sceneModels)
             m.scale(scale);
+    }
+
+    public void setPointCluster(RemotePointClusterGL pointCluster) {
+        this.pointCluster = pointCluster;
+        addModel(pointCluster);
+    }
+
+    public void setOctree(OctreeWireGL octree) {
+        this.octree = octree;
+        for (String id : octree.getAllIds()){
+                //pointCluster.fetchData(id);
+        }
+        pointCluster.fetchData(octree.root.id);
     }
 }

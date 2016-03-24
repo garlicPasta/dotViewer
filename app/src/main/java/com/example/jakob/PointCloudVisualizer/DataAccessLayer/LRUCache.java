@@ -2,13 +2,10 @@ package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import android.util.Log;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -17,8 +14,9 @@ import java.util.HashMap;
 
 public class LRUCache {
 
-    static int POINT_COUNT = 10000;
-    static int BLOCK_COUNT = 20;
+    static int POINT_COUNT = 1000;
+    static int BLOCK_COUNT = 400;
+    public static int MAX_POINTS = POINT_COUNT * BLOCK_COUNT;
     static int FLOAT_SIZE = 4;
     static int BLOCK_SIZE = POINT_COUNT * FLOAT_SIZE * 3;
     static int BUFFER_SIZE = BLOCK_SIZE * BLOCK_COUNT;
@@ -118,54 +116,12 @@ public class LRUCache {
         sizeBuffer.position(0);
     }
 
-    private class PointRequest extends Request<RasterProtos.Raster>{
-        private String key;
-
-        public PointRequest(int method, String url,
-                            Response.ErrorListener errorListener, String key) {
-            super(method, url, errorListener);
-            this.key = key;
-        }
-
-        @Override
-        protected Response<RasterProtos.Raster> parseNetworkResponse(NetworkResponse response) {
-            RasterProtos.Raster raster = null;
-            try {
-                raster = RasterProtos.Raster.parseFrom(response.data);
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-            }
-
-            float[] vertices = new float[3 * POINT_COUNT];
-            float[] colors = new float[3 * POINT_COUNT];
-            float[] size = new float[POINT_COUNT];
-
-            int j = 0;
-            int k = 0;
-
-            for (RasterProtos.Raster.Point3DRGB p : raster.getSampleList()) {
-                for (int i = 0; i < 3; i++) {
-                    vertices[j] = p.getPosition(i);
-                    colors[j++] = p.getColor(i);
-                }
-                size[k++] = p.getSize();
-            }
-            updateCache(key, vertices, colors, size);
-            vertexCount += j;
-            //Log.d("Response", response.substring(0, 500));
-            return Response.success(raster, HttpHeaderParser.parseCacheHeaders(response));
-        }
-
-        @Override
-        protected void deliverResponse(RasterProtos.Raster response) {
-            Log.d("Volley ","Receive Request for " + key);
-        }
-    }
 
     private void receiveNode(final String id) {
         final PointRequest sR = new PointRequest(
                 Request.Method.GET,
                 QueryFactory.buildSampleQuery(id).toString(),
+                this,
                 new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {

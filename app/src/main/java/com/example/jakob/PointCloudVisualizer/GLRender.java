@@ -6,9 +6,8 @@ import android.opengl.GLSurfaceView;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.OctreeWireGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.RemoteModelGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.RemotePointClusterGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
@@ -42,7 +41,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     private int mProgram;
 
     private Scene scene;
-    private RemoteModelGL model;
+    private RemotePointClusterGL model;
     private PolyIndexModelGL cube;
     private FPSCounter fpsCounter;
     private DataAcessLayer dal;
@@ -75,18 +74,8 @@ public class GLRender implements GLSurfaceView.Renderer {
         receiveLocations();
         scene = new Scene(gl);
         dal.setScene(scene);
-        // Use the ressource ID in the Parser Constructor
-        //Parser plyP = new NvmParser(context, R.raw.model2);
-        //model = new PointModelGL(plyP.getVertexBuffer(), plyP.getColorBuffer());
-        // model.centerOnCentroid();
-        model = new RemoteModelGL(dal.buildLRUCache());
-        String[] keys = {
-                "0.500-15.50056.500"
-        };
-        for (String key: keys)
-            model.fetchData(key);
-        scene.addModel(model);
         dal.buildMultiResTreeProtos();
+        dal.buildRemotePointCluster();
     }
 
     private void receiveLocations(){

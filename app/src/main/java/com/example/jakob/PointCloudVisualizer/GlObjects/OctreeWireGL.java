@@ -15,13 +15,19 @@ import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildShor
 
 public class OctreeWireGL{
 
-    private class OctreeNodeGL {
+    public class OctreeNodeGL {
+        public String id;
+        boolean isLeaf;
+        int pointCount;
         OctreeNodeGL[] octants = new OctreeNodeGL[8];
         float[] center;
         float length;
         BoxGL box;
 
         public OctreeNodeGL(MultiResTreeProtos.MRTree.MRNode node) {
+            id = node.getId();
+            isLeaf = node.getIsLeaf();
+            pointCount = node.getPointCount();
             center = new float[]{(float) node.getCenter(0),
                     (float) node.getCenter(1),
                     (float) node.getCenter(2)};
@@ -105,7 +111,7 @@ public class OctreeWireGL{
         }
     }
 
-    private OctreeNodeGL root;
+    public OctreeNodeGL root;
 
     public OctreeWireGL(MultiResTreeProtos.MRTree tree){
         root = new OctreeNodeGL(tree.getRoot());
@@ -117,16 +123,65 @@ public class OctreeWireGL{
 
     public List<BoxGL> exportOctreeBoxes(){
         List<BoxGL> boxes = new LinkedList<>();
-        _addToBoxes(root, boxes);
+        _exportOctreeBoxes(root, boxes);
         return boxes;
     }
 
-    private void _addToBoxes(OctreeNodeGL currentNode, List<BoxGL> boxes) {
+    private void _exportOctreeBoxes(OctreeNodeGL currentNode, List<BoxGL> boxes) {
         if (currentNode == null)
             return;
         boxes.add(currentNode.box);
         for (OctreeNodeGL node : currentNode.octants ) {
-            _addToBoxes(node, boxes);
+            _exportOctreeBoxes(node, boxes);
+        }
+    }
+
+    public List<String> getChildrenIds(){
+        List<String> ids = new LinkedList<>();
+        _getChildrenIds(root, ids);
+        return ids;
+    }
+
+    private void _getChildrenIds(OctreeNodeGL currentNode, List<String> ids){
+        if (currentNode.isLeaf){
+            ids.add(currentNode.id);
+            return;
+        }
+        for (OctreeNodeGL node : currentNode.octants ) {
+            _getChildrenIds(node, ids);
+        }
+    }
+
+    public List<String> getAllIds(){
+        List<String> ids = new LinkedList<>();
+        _getAllIds(root, ids);
+        return ids;
+    }
+
+    private void _getAllIds(OctreeNodeGL currentNode, List<String> ids){
+        ids.add(currentNode.id);
+        if (currentNode.isLeaf){
+            return;
+        }
+        for (OctreeNodeGL node : currentNode.octants ) {
+            _getAllIds(node, ids);
+        }
+    }
+
+    public List<BoxGL> exportChildren(){
+        List<BoxGL> children = new LinkedList<>();
+        _exportChildren(root, children);
+        return children;
+    }
+
+    private void _exportChildren(OctreeNodeGL currentNode, List<BoxGL> children){
+        if (currentNode.isLeaf ){
+            if (currentNode.pointCount > 0)
+                children.add(currentNode.box);
+            return;
+        }
+        for (OctreeNodeGL node : currentNode.octants ) {
+            _exportChildren(node, children);
         }
     }
 }

@@ -48,7 +48,8 @@ public class MRTRequest {
         @Override
         protected void deliverResponse(MultiResTreeProtos.MRTree tree) {
             OctreeWireGL octree = new OctreeWireGL(tree);
-            scene.addModels(octree.exportOctreeBoxes());
+            scene.setOctree(octree);
+            scene.addModels(octree.exportChildren());
         }
     }
 }
