@@ -6,8 +6,8 @@ import android.opengl.GLSurfaceView;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexModelGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.RemotePointClusterGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexBufferModelGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.RemotePointClusterGLBuffer;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
@@ -41,8 +41,8 @@ public class GLRender implements GLSurfaceView.Renderer {
     private int mProgram;
 
     private Scene scene;
-    private RemotePointClusterGL model;
-    private PolyIndexModelGL cube;
+    private RemotePointClusterGLBuffer model;
+    private PolyIndexBufferModelGL cube;
     private FPSCounter fpsCounter;
     private DataAcessLayer dal;
 

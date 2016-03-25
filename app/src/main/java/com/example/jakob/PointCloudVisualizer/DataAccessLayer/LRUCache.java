@@ -14,8 +14,8 @@ import java.util.HashMap;
 
 public class LRUCache {
 
-    static int POINT_COUNT = 1000;
-    static int BLOCK_COUNT = 400;
+    static int POINT_COUNT = 3700;
+    static int BLOCK_COUNT = 267;
     public static int MAX_POINTS = POINT_COUNT * BLOCK_COUNT;
     static int FLOAT_SIZE = 4;
     static int BLOCK_SIZE = POINT_COUNT * FLOAT_SIZE * 3;

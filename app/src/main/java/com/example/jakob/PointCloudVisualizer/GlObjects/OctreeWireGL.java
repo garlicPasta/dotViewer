@@ -22,7 +22,7 @@ public class OctreeWireGL{
         OctreeNodeGL[] octants = new OctreeNodeGL[8];
         float[] center;
         float length;
-        BoxGL box;
+        BoxGLBuffer box;
 
         public OctreeNodeGL(MultiResTreeProtos.MRTree.MRNode node) {
             id = node.getId();
@@ -32,7 +32,7 @@ public class OctreeWireGL{
                     (float) node.getCenter(1),
                     (float) node.getCenter(2)};
             length = (float) node.getCellLength();
-            box = new BoxGL(center, length);
+            box = new BoxGLBuffer(center, length);
             for (int i=0; i < node.getOctantCount(); i++){
                 if (node.getOctant(i) != null)
                     octants[i] = new OctreeNodeGL(node.getOctant(i));
@@ -48,7 +48,7 @@ public class OctreeWireGL{
         }
     }
 
-    public static class BoxGL extends ModelGL{
+    public static class BoxGLBuffer extends BufferModelGL {
 
         protected ShortBuffer mIndexBuffer;
 
@@ -90,7 +90,7 @@ public class OctreeWireGL{
         };
 
 
-        public BoxGL(float[] center, float length){
+        public BoxGLBuffer(float[] center, float length){
             super(BufferHelper.buildFloatBuffer(24));
             for (int i = 0; i < cubeVertices.length / 3 ; i++) {
                 for (int j = 0; j < 3; j++) {
@@ -121,13 +121,13 @@ public class OctreeWireGL{
         root.draw();
     }
 
-    public List<BoxGL> exportOctreeBoxes(){
-        List<BoxGL> boxes = new LinkedList<>();
+    public List<BoxGLBuffer> exportOctreeBoxes(){
+        List<BoxGLBuffer> boxes = new LinkedList<>();
         _exportOctreeBoxes(root, boxes);
         return boxes;
     }
 
-    private void _exportOctreeBoxes(OctreeNodeGL currentNode, List<BoxGL> boxes) {
+    private void _exportOctreeBoxes(OctreeNodeGL currentNode, List<BoxGLBuffer> boxes) {
         if (currentNode == null)
             return;
         boxes.add(currentNode.box);
@@ -136,6 +136,10 @@ public class OctreeWireGL{
         }
     }
 
+    /**
+     * @return
+     * List with all Ids of child notes
+     */
     public List<String> getChildrenIds(){
         List<String> ids = new LinkedList<>();
         _getChildrenIds(root, ids);
@@ -152,6 +156,29 @@ public class OctreeWireGL{
         }
     }
 
+    public List<String> getIdsMaxLevel(int level){
+        List<String> ids = new LinkedList<>();
+        _getIdsMaxLevel(root, ids, level);
+        return ids;
+    }
+
+    private void _getIdsMaxLevel(OctreeNodeGL currentNode, List<String> ids, int level){
+        if (currentNode == null)
+            return;
+        if ((currentNode.isLeaf) || level == 0){
+            ids.add(currentNode.id);
+            return;
+        }
+        for (OctreeNodeGL node : currentNode.octants ) {
+            _getIdsMaxLevel(node, ids, level-1);
+        }
+    }
+
+    /**
+     * @return
+     * List with all Ids
+     *
+     */
     public List<String> getAllIds(){
         List<String> ids = new LinkedList<>();
         _getAllIds(root, ids);
@@ -168,13 +195,17 @@ public class OctreeWireGL{
         }
     }
 
-    public List<BoxGL> exportChildren(){
-        List<BoxGL> children = new LinkedList<>();
+    /**
+     * @return
+     * Function returns all Octans/Boxes which are children
+     */
+    public List<BoxGLBuffer> exportChildren(){
+        List<BoxGLBuffer> children = new LinkedList<>();
         _exportChildren(root, children);
         return children;
     }
 
-    private void _exportChildren(OctreeNodeGL currentNode, List<BoxGL> children){
+    private void _exportChildren(OctreeNodeGL currentNode, List<BoxGLBuffer> children){
         if (currentNode.isLeaf ){
             if (currentNode.pointCount > 0)
                 children.add(currentNode.box);

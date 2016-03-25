@@ -1,6 +1,6 @@
 package com.example.jakob.PointCloudVisualizer;
 
-import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
+import com.example.jakob.PointCloudVisualizer.GlObjects.PointBufferModelGL;
 
 import junit.framework.TestCase;
 
@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class PointModelTest extends TestCase {
 
-    PointModelGL cube;
+    PointBufferModelGL cube;
 
     private float vertices[] = {
             -1.0f, -1.0f, -1.0f,
@@ -22,7 +22,7 @@ public class PointModelTest extends TestCase {
     };
 
     public void setUp() {
-        cube = new PointModelGL(vertices);
+        cube = new PointBufferModelGL(vertices);
         assertNotNull(cube);
     }
 

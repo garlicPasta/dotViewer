@@ -6,11 +6,15 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import java.util.List;
 
 public class PointRequest extends Request<RasterProtos.Raster> {
     private String key;
     private LRUCache cache;
+    private int sampleCount;
 
     public PointRequest(int method, String url,LRUCache cache,
                         Response.ErrorListener errorListener, String key) {
@@ -35,7 +39,11 @@ public class PointRequest extends Request<RasterProtos.Raster> {
         int j = 0;
         int k = 0;
 
-        for (RasterProtos.Raster.Point3DRGB p : raster.getSampleList()) {
+        sampleCount = raster.getSampleCount();
+
+        List<RasterProtos.Raster.Point3DRGB> sampleList = raster.getSampleList();
+        for (int i1 = 0; i1 < Math.min(raster.getSampleCount(), cache.POINT_COUNT); i1++) {
+            RasterProtos.Raster.Point3DRGB p = sampleList.get(i1);
             for (int i = 0; i < 3; i++) {
                 vertices[j] = p.getPosition(i);
                 colors[j++] = p.getColor(i);
@@ -50,7 +58,7 @@ public class PointRequest extends Request<RasterProtos.Raster> {
 
     @Override
     protected void deliverResponse(RasterProtos.Raster response) {
-        Log.d("Volley ", "Receive Request for " + key);
+        Log.d("Volley ", "Received " + sampleCount + "Points for key:" + key);
     }
 }
 

@@ -6,10 +6,11 @@ import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.GL_POINTS;
 
-public class RemotePointClusterGL extends ModelGL{
+
+public class RemotePointClusterGLBuffer extends BufferModelGL {
     LRUCache cache;
 
-    public RemotePointClusterGL(LRUCache cache) {
+    public RemotePointClusterGLBuffer(LRUCache cache) {
         super(cache.vertexBuffer, cache.colorBuffer, cache.sizeBuffer);
         this.cache = cache;
     }

@@ -6,18 +6,18 @@ import static android.opengl.GLES20.GL_TRIANGLES;
 import static android.opengl.GLES20.glDrawArrays;
 
 
-public class PolyModelGL extends ModelGL{
+public class PolyBufferModelGL extends BufferModelGL {
 
 
-    PolyModelGL(float[] vertices) {
+    PolyBufferModelGL(float[] vertices) {
         super(vertices);
     }
 
-    PolyModelGL(float[] vertices, float[] colors) {
+    PolyBufferModelGL(float[] vertices, float[] colors) {
         super(vertices, colors);
     }
 
-    PolyModelGL(FloatBuffer vertices, FloatBuffer colors) {
+    PolyBufferModelGL(FloatBuffer vertices, FloatBuffer colors) {
         super(vertices, colors);
     }
 

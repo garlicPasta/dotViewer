@@ -1,9 +1,6 @@
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 
-import com.example.jakob.PointCloudVisualizer.GlObjects.PointModelGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.PolyModelGL;
-
 public class FactoryModels {
     static float vertices[] = {
             -1.0f, -1.0f, -1.0f,
@@ -46,13 +43,13 @@ public class FactoryModels {
             3, 0, 1, 3, 1, 2
     };
 
-    public static PointModelGL buildCenterPoint(){
+    public static PointBufferModelGL buildCenterPoint(){
         float[] vertex = {0f,0f,0f};
         float[] color = {1f,0f,0f};
-        return new PointModelGL(vertex, color);
+        return new PointBufferModelGL(vertex, color);
     }
 
-    public static PolyModelGL buildPlane(){
+    public static PolyBufferModelGL buildPlane(){
         float[] vertex = {
                 -1f, -0.0f, 0f,
                 1f, 1.0f, 0f,
@@ -69,14 +66,14 @@ public class FactoryModels {
                 0f, 0f, 0f,
                 255 * 0.3f,0.0f, 0.0f};
 
-        return new PolyModelGL(vertex, color);
+        return new PolyBufferModelGL(vertex, color);
     }
 
-    public static PolyIndexModelGL buildCube(){
-        return new PolyIndexModelGL(vertices, colors, indices);
+    public static PolyIndexBufferModelGL buildCube(){
+        return new PolyIndexBufferModelGL(vertices, colors, indices);
     }
 
-    public static PolyIndexModelGL buildBackground(){
-        return new PolyIndexModelGL(vertices, colorsBg, indices);
+    public static PolyIndexBufferModelGL buildBackground(){
+        return new PolyIndexBufferModelGL(vertices, colorsBg, indices);
     }
 }

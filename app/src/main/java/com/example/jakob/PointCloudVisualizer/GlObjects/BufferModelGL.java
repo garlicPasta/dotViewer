@@ -3,7 +3,6 @@ package com.example.jakob.PointCloudVisualizer.GlObjects;
 import android.opengl.Matrix;
 
 import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
-import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 import java.nio.FloatBuffer;
 
 import static android.opengl.GLES20.glEnableVertexAttribArray;
@@ -14,21 +13,15 @@ import static android.opengl.GLES20.GL_FLOAT;
 import static com.example.jakob.PointCloudVisualizer.GLRender.SIZE_COMPONENT_COUNT;
 import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildFloatBuffer;
 
-public abstract class ModelGL {
+public abstract class BufferModelGL extends ModelGl{
+
     protected FloatBuffer mVertexBuffer;
     protected FloatBuffer mColorBuffer;
-    private FloatBuffer mSizeBuffer;
-    private float scale;
-    private int vertexCount;
+    protected FloatBuffer mSizeBuffer;
 
-    float[] modelMatrix;
-    float[] transMatrix;
-    float[] rotationMatrix;
-    float[] scaleMatrix;
-    float[] centerMatrix;
 
-    ModelGL(FloatBuffer vertices){
-        scale = 1;
+    BufferModelGL(FloatBuffer vertices){
+        super();
         mVertexBuffer = vertices;
         mVertexBuffer.position(0);
         if (mColorBuffer == null)
@@ -40,41 +33,26 @@ public abstract class ModelGL {
             }
             mSizeBuffer = BufferHelper.buildFloatBuffer(fb);
         }
-        initMatrices();
-        vertexCount = vertices.capacity() / 3;
     }
 
-    ModelGL(FloatBuffer vertices, FloatBuffer colors) {
+    BufferModelGL(FloatBuffer vertices, FloatBuffer colors) {
         this(vertices);
         mColorBuffer = colors;
         mColorBuffer.position(0);
     }
 
-    ModelGL(FloatBuffer vertices, FloatBuffer colors, FloatBuffer size) {
+    BufferModelGL(FloatBuffer vertices, FloatBuffer colors, FloatBuffer size) {
         this(vertices, colors);
         mSizeBuffer = size;
         mSizeBuffer.position(0);
     }
 
-    ModelGL(float[] vertices) {
+    BufferModelGL(float[] vertices) {
         this(buildFloatBuffer(vertices, 3));
     }
 
-    ModelGL(float[] vertices, float[] colors) {
+    BufferModelGL(float[] vertices, float[] colors) {
         this(buildFloatBuffer(vertices, 4), buildFloatBuffer(colors, 4));
-    }
-
-    private void initMatrices(){
-        scaleMatrix = new float[16];
-        modelMatrix = new float[16];
-        transMatrix = new float[16];
-        centerMatrix = new float[16];
-        rotationMatrix = new float[16];
-        Matrix.setIdentityM(transMatrix, 0);
-        Matrix.setIdentityM(rotationMatrix, 0);
-        Matrix.setIdentityM(centerMatrix, 0);
-        Matrix.setIdentityM(scaleMatrix, 0);
-        Matrix.scaleM(scaleMatrix, 0, scale, scale, scale);
     }
 
     public void bindVertex(int aPositionLocation){
@@ -110,33 +88,12 @@ public abstract class ModelGL {
         return centroid;
     }
 
-    public float[] getModelMatrix() {
-        MatrixHelper.multMatrices(modelMatrix,
-                transMatrix,
-                rotationMatrix,
-                scaleMatrix,
-                centerMatrix
-        );
-        return modelMatrix;
-    }
-
-    public void rotate(float[] angles){
-        MatrixHelper.addRotationToMatrix(rotationMatrix, angles);
-    }
-
-    public void scale(float scale){
-        scaleMatrix[0]= scale;
-        scaleMatrix[5]= scale;
-        scaleMatrix[10]= scale;
-    }
-
     public void centerOnCentroid(){
         float[] centroid = getCentroid();
         Matrix.setIdentityM(centerMatrix, 0);
         Matrix.translateM(centerMatrix, 0, -centroid[0], -centroid[1], -centroid[2]);
     }
 
-    public abstract void draw();
 
     public int getVertexCount() {
         return mVertexBuffer.capacity() / 3;

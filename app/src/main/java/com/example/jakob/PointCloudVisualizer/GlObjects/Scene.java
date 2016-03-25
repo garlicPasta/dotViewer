@@ -10,10 +10,10 @@ import static com.example.jakob.PointCloudVisualizer.GlObjects.FactoryModels.bui
 
 
 public class Scene {
-    List<ModelGL> sceneModels;
-    RemotePointClusterGL pointCluster;
+    List<BufferModelGL> sceneModels;
+    RemotePointClusterGLBuffer pointCluster;
     OctreeWireGL octree;
-    PolyModelGL background;
+    PolyBufferModelGL background;
     CameraGL camera;
     GL10 gl;
 
@@ -30,7 +30,7 @@ public class Scene {
                           int aSizeLocation, int uMVPMatrixLocation){
         drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
         for (int i = 0; i < sceneModels.size(); i++) {
-            ModelGL model = sceneModels.get(i);
+            BufferModelGL model = sceneModels.get(i);
             Matrix.setIdentityM(mvpMatrix, 0);
             MatrixHelper.multMatrices(
                     mvpMatrix,
@@ -46,12 +46,12 @@ public class Scene {
         }
     }
 
-    public synchronized void addModel(ModelGL models){
+    public synchronized void addModel(BufferModelGL models){
         sceneModels.add(models);
     }
 
-    public void addModels(List<OctreeWireGL.BoxGL> models){
-        for (ModelGL model : models){
+    public void addModels(List<OctreeWireGL.BoxGLBuffer> models){
+        for (BufferModelGL model : models){
             addModel(model);
         }
     }
@@ -77,25 +77,25 @@ public class Scene {
     }
 
     public void rotateScene(float[] angles){
-        for (ModelGL m : sceneModels)
+        for (BufferModelGL m : sceneModels)
             m.rotate(angles);
     }
 
     public void scaleScene(float scale){
-        for (ModelGL m : sceneModels)
+        for (BufferModelGL m : sceneModels)
             m.scale(scale);
     }
 
-    public void setPointCluster(RemotePointClusterGL pointCluster) {
+    public void setPointCluster(RemotePointClusterGLBuffer pointCluster) {
         this.pointCluster = pointCluster;
         addModel(pointCluster);
     }
 
     public void setOctree(OctreeWireGL octree) {
         this.octree = octree;
-        for (String id : octree.getAllIds()){
-                //pointCluster.fetchData(id);
+        for (String id : octree.getIdsMaxLevel(5)){
+                pointCluster.fetchData(id);
         }
-        pointCluster.fetchData(octree.root.id);
+        //pointCluster.fetchData(octree.root.id);
     }
 }
