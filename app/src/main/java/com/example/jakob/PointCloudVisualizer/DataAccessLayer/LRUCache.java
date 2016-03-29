@@ -1,3 +1,4 @@
+/*
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import android.util.Log;
@@ -118,7 +119,7 @@ public class LRUCache {
 
 
     private void receiveNode(final String id) {
-        final PointRequest sR = new PointRequest(
+        final SampleRequest sR = new SampleRequest(
                 Request.Method.GET,
                 QueryFactory.buildSampleQuery(id).toString(),
                 this,
@@ -137,3 +138,4 @@ public class LRUCache {
         this.sizeBuffer.rewind();
     }
 }
+*/

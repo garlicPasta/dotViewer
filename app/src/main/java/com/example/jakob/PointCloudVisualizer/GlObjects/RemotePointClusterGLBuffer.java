@@ -1,7 +1,7 @@
+/*
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUCache;
 
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.GL_POINTS;
@@ -28,3 +28,4 @@ public class RemotePointClusterGLBuffer extends BufferModelGL {
         glDrawArrays(GL_POINTS, 0, LRUCache.MAX_POINTS -1);
     }
 }
+*/

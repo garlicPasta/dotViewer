@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.Toast;
 
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
+import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAccessLayer;
 
 public class GLRenderSurfaceView extends GLSurfaceView  {
 
@@ -38,7 +38,7 @@ public class GLRenderSurfaceView extends GLSurfaceView  {
         mScaleFactor = 1;
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
-        mRenderer = new GLRender(context, new DataAcessLayer(context));
+        mRenderer = new GLRender(context, new DataAccessLayer(context));
         if (supportsEs2(context)) {
             setEGLContextClientVersion(2);
             renderSet = true;

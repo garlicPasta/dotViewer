@@ -4,10 +4,10 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
+import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAccessLayer;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.PolyIndexBufferModelGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.RemotePointClusterGLBuffer;
+import com.example.jakob.PointCloudVisualizer.GlObjects.RemotePointClusterGL;
 import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
 import com.example.jakob.PointCloudVisualizer.util.FPSCounter;
 import com.example.jakob.PointCloudVisualizer.util.ShaderHelper;
@@ -41,10 +41,9 @@ public class GLRender implements GLSurfaceView.Renderer {
     private int mProgram;
 
     private Scene scene;
-    private RemotePointClusterGLBuffer model;
     private PolyIndexBufferModelGL cube;
     private FPSCounter fpsCounter;
-    private DataAcessLayer dal;
+    private DataAccessLayer dal;
 
     private int aPositionLocation;
     private int uMVPMatrixLocation;
@@ -56,7 +55,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     private float scale;
 
 
-    public GLRender(Context context, DataAcessLayer dal) {
+    public GLRender(Context context, DataAccessLayer dal) {
         this.context = context;
         this.dal = dal;
         rotation = new float[]{0, 0, 0};
@@ -73,9 +72,7 @@ public class GLRender implements GLSurfaceView.Renderer {
         glUseProgram(mProgram);
         receiveLocations();
         scene = new Scene(gl);
-        dal.setScene(scene);
-        dal.buildMultiResTreeProtos();
-        dal.buildRemotePointCluster();
+        scene.addModel(new RemotePointClusterGL(dal));
     }
 
     private void receiveLocations(){

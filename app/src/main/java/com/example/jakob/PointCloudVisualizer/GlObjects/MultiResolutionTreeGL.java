@@ -13,7 +13,7 @@ import static android.opengl.GLES20.GL_UNSIGNED_SHORT;
 import static android.opengl.GLES20.glDrawElements;
 import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildShortBuffer;
 
-public class OctreeWireGL{
+public class MultiResolutionTreeGL {
 
     public class OctreeNodeGL {
         public String id;
@@ -22,7 +22,7 @@ public class OctreeWireGL{
         OctreeNodeGL[] octants = new OctreeNodeGL[8];
         float[] center;
         float length;
-        BoxGLBuffer box;
+        BoxGL box;
 
         public OctreeNodeGL(MultiResTreeProtos.MRTree.MRNode node) {
             id = node.getId();
@@ -32,7 +32,7 @@ public class OctreeWireGL{
                     (float) node.getCenter(1),
                     (float) node.getCenter(2)};
             length = (float) node.getCellLength();
-            box = new BoxGLBuffer(center, length);
+            box = new BoxGL(center, length);
             for (int i=0; i < node.getOctantCount(); i++){
                 if (node.getOctant(i) != null)
                     octants[i] = new OctreeNodeGL(node.getOctant(i));
@@ -48,72 +48,10 @@ public class OctreeWireGL{
         }
     }
 
-    public static class BoxGLBuffer extends BufferModelGL {
-
-        protected ShortBuffer mIndexBuffer;
-
-         float[] cubeVertices = new float[]{
-                -1.0f, -1.0f, 1.0f,
-                1.0f, -1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f, 1.0f,
-                -1.0f, -1.0f, -1.0f,
-                1.0f, -1.0f, -1.0f,
-                1.0f, 1.0f, -1.0f,
-                -1.0f, 1.0f, -1.0f,
-        };
-
-        float[] cubeColor = new float[]{
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-                128f, 192f, 64f,
-        };
-
-        short indices[] = {
-                0,1,
-                1,2,
-                2,3,
-                3,0,
-                4,5,
-                5,6,
-                6,7,
-                7,4,
-                0,4,
-                1,5,
-                2,6,
-                3,7,
-        };
-
-
-        public BoxGLBuffer(float[] center, float length){
-            super(BufferHelper.buildFloatBuffer(24));
-            for (int i = 0; i < cubeVertices.length / 3 ; i++) {
-                for (int j = 0; j < 3; j++) {
-                    cubeVertices[3 * i + j] *= length;
-                    cubeVertices[3 * i + j] += center[j];
-                }
-            }
-            this.mVertexBuffer.put(cubeVertices);
-            this.mVertexBuffer.position(0);
-            this.mColorBuffer.put(cubeColor);
-            this.mColorBuffer.position(0);
-            this.mIndexBuffer = buildShortBuffer(indices);
-        }
-
-        @Override
-        public void draw(){
-            glDrawElements(GL_LINES, indices.length, GL_UNSIGNED_SHORT, mIndexBuffer);
-        }
-    }
 
     public OctreeNodeGL root;
 
-    public OctreeWireGL(MultiResTreeProtos.MRTree tree){
+    public MultiResolutionTreeGL(MultiResTreeProtos.MRTree tree){
         root = new OctreeNodeGL(tree.getRoot());
     }
 
@@ -121,13 +59,13 @@ public class OctreeWireGL{
         root.draw();
     }
 
-    public List<BoxGLBuffer> exportOctreeBoxes(){
-        List<BoxGLBuffer> boxes = new LinkedList<>();
+    public List<BoxGL> exportOctreeBoxes(){
+        List<BoxGL> boxes = new LinkedList<>();
         _exportOctreeBoxes(root, boxes);
         return boxes;
     }
 
-    private void _exportOctreeBoxes(OctreeNodeGL currentNode, List<BoxGLBuffer> boxes) {
+    private void _exportOctreeBoxes(OctreeNodeGL currentNode, List<BoxGL> boxes) {
         if (currentNode == null)
             return;
         boxes.add(currentNode.box);
@@ -199,13 +137,13 @@ public class OctreeWireGL{
      * @return
      * Function returns all Octans/Boxes which are children
      */
-    public List<BoxGLBuffer> exportChildren(){
-        List<BoxGLBuffer> children = new LinkedList<>();
+    public List<BoxGL> exportChildren(){
+        List<BoxGL> children = new LinkedList<>();
         _exportChildren(root, children);
         return children;
     }
 
-    private void _exportChildren(OctreeNodeGL currentNode, List<BoxGLBuffer> children){
+    private void _exportChildren(OctreeNodeGL currentNode, List<BoxGL> children){
         if (currentNode.isLeaf ){
             if (currentNode.pointCount > 0)
                 children.add(currentNode.box);

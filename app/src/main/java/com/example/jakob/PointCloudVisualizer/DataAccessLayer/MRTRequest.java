@@ -7,14 +7,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.example.jakob.PointCloudVisualizer.GlObjects.OctreeWireGL;
-import com.example.jakob.PointCloudVisualizer.GlObjects.Scene;
+import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGLOwner;
+import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGL;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 
 public class MRTRequest {
 
-    static public void sendRequest(RequestQueue rQ, Scene s){
+    static public void sendRequest(RequestQueue rQ, MultiResolutionTreeGLOwner owner){
         ProtoRequest request = new ProtoRequest(Request.Method.GET,
                 QueryFactory.buildMRTQuery().toString(),
                 new Response.ErrorListener() {
@@ -22,16 +22,17 @@ public class MRTRequest {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Error", "ProtoRequest failed");
                     }
-                }, s);
+                }, owner);
         rQ.add(request);
     }
 
     static class ProtoRequest extends Request<MultiResTreeProtos.MRTree> {
-        Scene scene;
+        MultiResolutionTreeGLOwner owner;
 
-        public ProtoRequest(int method, String url, Response.ErrorListener listener, Scene s) {
+        public ProtoRequest(int method, String url, Response.ErrorListener listener,
+                            MultiResolutionTreeGLOwner owner) {
             super(method, url, listener);
-            scene = s;
+            this.owner = owner;
         }
 
         @Override
@@ -47,8 +48,8 @@ public class MRTRequest {
 
         @Override
         protected void deliverResponse(MultiResTreeProtos.MRTree tree) {
-            OctreeWireGL octree = new OctreeWireGL(tree);
-            scene.setOctree(octree);
+            MultiResolutionTreeGL remote = new MultiResolutionTreeGL(tree);
+            owner.setMultiResolutionTree(remote);
             //scene.addModels(octree.exportChildren());
         }
     }

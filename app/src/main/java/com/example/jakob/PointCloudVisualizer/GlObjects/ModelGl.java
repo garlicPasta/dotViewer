@@ -13,6 +13,10 @@ public abstract class ModelGl {
 
     protected float scale;
 
+    public int aPositionLocation;
+    public int aColorLocation;
+    public int aSizeLocation;
+
     ModelGl(){
         scale = 1;
         initMatrices();

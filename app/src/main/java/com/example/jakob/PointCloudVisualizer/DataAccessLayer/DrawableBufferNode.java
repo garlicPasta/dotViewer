@@ -1,8 +1,5 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
-import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
-
-import java.nio.Buffer;
 import java.nio.FloatBuffer;
 
 import static android.opengl.GLES20.glDrawArrays;
@@ -15,23 +12,23 @@ import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_POINTS;
 
 
-public class CacheFloatBufferNode {
+public class DrawableBufferNode {
 
     String key;
-    CacheNode pre;
-    CacheNode next;
+    DrawableBufferNode pre;
+    DrawableBufferNode next;
     FloatBuffer vertexBuffer;
     FloatBuffer colorBuffer;
     FloatBuffer sizeBuffer;
-    int pointCount;
+    public int pointCount;
 
 
-    public CacheFloatBufferNode(String key, float[] vertices, float[] colors, float[] size){
+    public DrawableBufferNode(String key, FloatBuffer vertices, FloatBuffer colors, FloatBuffer size){
         this.key = key;
-        pointCount = vertices.length / 3;
-        vertexBuffer = BufferHelper.buildFloatBuffer(vertices);
-        colorBuffer = BufferHelper.buildFloatBuffer(colors);
-        sizeBuffer = BufferHelper.buildFloatBuffer(size);
+        pointCount = vertices.capacity() / 3;
+        vertexBuffer = vertices;
+        colorBuffer = colors;
+        sizeBuffer = size;
     }
 
     public void bindVertex(int aPositionLocation){

@@ -7,13 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAcessLayer;
+import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAccessLayer;
 
 
 public class BasicActivity extends ActionBarActivity {
     private GLSurfaceView glSurfaceView;
     private boolean renderSet = false;
-    private DataAcessLayer dal;
+    private DataAccessLayer dal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
