@@ -35,8 +35,8 @@ public class Scene {
                     mvpMatrix,
                     camera.projectionMatrix,
                     camera.viewMatrix,
-                    model.getModelMatrix(),
-                    model.centerMatrix);
+                    model.getModelMatrix()
+                    );
             GLES20.glUniformMatrix4fv(uMVPMatrixLocation, 1, false, mvpMatrix, 0);
             model.aPositionLocation = aPositionLocation;
             model.aColorLocation = aColorLocation;

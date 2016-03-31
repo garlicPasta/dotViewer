@@ -11,6 +11,8 @@ import java.util.List;
 import static android.opengl.GLES20.GL_LINES;
 import static android.opengl.GLES20.GL_UNSIGNED_SHORT;
 import static android.opengl.GLES20.glDrawElements;
+import static android.opengl.Matrix.multiplyMM;
+import static android.opengl.Matrix.multiplyMV;
 import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildShortBuffer;
 
 public class MultiResolutionTreeGL {
@@ -21,6 +23,7 @@ public class MultiResolutionTreeGL {
         int pointCount;
         OctreeNodeGL[] octants = new OctreeNodeGL[8];
         float[] center;
+        float[][] edgePoints;
         float length;
         BoxGL box;
 
@@ -37,6 +40,25 @@ public class MultiResolutionTreeGL {
                 if (node.getOctant(i) != null)
                     octants[i] = new OctreeNodeGL(node.getOctant(i));
             }
+            edgePoints = calculateEdgePoints();
+        }
+
+        private float[][] calculateEdgePoints() {
+            float[] sign = {-1, 1};
+            float[] vec = {center[0]/2, center[1]/2, center[2]/3};
+            float [][] edges = new float[8][3];
+            for (int i=0; i<2; i++){
+                for (int j=0; j<2; j++){
+                    for (int k=0; k<2; k++){
+                        edges[4*i + 2*j + k] = new float[]{
+                                center[0] + sign[i] * vec[0],
+                                center[1] + sign[j] * vec[1],
+                                center[2] + sign[k] * vec[2]
+                            };
+                    }
+                }
+            }
+            return edges;
         }
 
         public void draw(){
@@ -45,6 +67,23 @@ public class MultiResolutionTreeGL {
                 if (octants[i] != null)
                     octants[i].draw();
             }
+        }
+
+        public boolean isVisible(CameraGL c, ModelGl m){
+            float[] MVmatrix = new float[16];
+            multiplyMM(MVmatrix, 0, c.viewMatrix, 0, m.getModelMatrix(), 0);
+            float[] projectedPoint = new float[4];
+            for (float[] edgePoint : edgePoints){
+                multiplyMV(projectedPoint, 0, MVmatrix, 0, edgePoint, 0);
+                if (projectedPoint[0] > -1 && projectedPoint[0] < 1 &&
+                        projectedPoint[1] > -1 && projectedPoint[1] < 1)
+                    return true;
+            }
+            return false;
+        }
+
+        public float getDetailFactor(CameraGL c){
+            return 0;
         }
     }
 
@@ -103,13 +142,31 @@ public class MultiResolutionTreeGL {
     private void _getIdsMaxLevel(OctreeNodeGL currentNode, List<String> ids, int level){
         if (currentNode == null)
             return;
-        if ((currentNode.isLeaf) || level == 0){
-            ids.add(currentNode.id);
+        if (currentNode.isLeaf || level == 0){
+            if (currentNode.pointCount > 0)
+                ids.add(currentNode.id);
             return;
         }
         for (OctreeNodeGL node : currentNode.octants ) {
             _getIdsMaxLevel(node, ids, level-1);
         }
+    }
+
+    public List<String> getIdsConditional(){
+        List<String> ids = new LinkedList<>();
+        _getIdConditional(root, ids);
+        return ids;
+    }
+
+    private void _getIdConditional(OctreeNodeGL currentNode, List<String> ids) {
+        if (currentNode == null)
+            return;
+        if ((currentNode.isLeaf)){
+            ids.add(currentNode.id);
+            return;
+        }
+
+
     }
 
     /**

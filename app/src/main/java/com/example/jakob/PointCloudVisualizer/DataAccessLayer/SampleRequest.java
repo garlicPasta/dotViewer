@@ -15,7 +15,7 @@ import java.nio.FloatBuffer;
 
 public class SampleRequest {
 
-    static public void sendRequest(String id, RequestQueue rQ, LRUDrawableCache cache){
+    static public void sendRequest(final String id, RequestQueue rQ, final LRUDrawableCache cache){
         SampleProtoRequest request = new SampleProtoRequest(
                 Request.Method.GET,
                 QueryFactory.buildSampleQuery(id).toString(),
@@ -25,6 +25,7 @@ public class SampleRequest {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Error", "ProtoRequest failed");
+                        cache.remove(cache.getNode(id));
                     }
                 });
         rQ.add(request);
@@ -44,6 +45,8 @@ public class SampleRequest {
 
         @Override
         protected Response<RasterProtos.Raster> parseNetworkResponse(NetworkResponse response) {
+            DrawableBufferNode node = cache.getNode(key);
+
             RasterProtos.Raster raster = null;
             try {
                 raster = RasterProtos.Raster.parseFrom(response.data);
@@ -52,9 +55,12 @@ public class SampleRequest {
             }
 
             sampleCount = raster.getSampleCount();
-
-            if (sampleCount == 0)
+            if (sampleCount == 0) {
+                cache.remove(node);
                 return Response.success(raster, HttpHeaderParser.parseCacheHeaders(response));
+            }
+            cache.updatePointCount(sampleCount);
+            node.setPointCount(sampleCount);
 
             FloatBuffer vertices = BufferHelper.buildFloatBuffer(3 * sampleCount);
             FloatBuffer colors = BufferHelper.buildFloatBuffer(3 * sampleCount);
@@ -71,13 +77,27 @@ public class SampleRequest {
             colors.rewind();
             size.rewind();
 
-            cache.set(key, vertices, colors, size);
+            node.setVertexBuffer(vertices);
+            node.setColorBuffer(colors);
+            node.setSizeBuffer(size);
+
             return Response.success(raster, HttpHeaderParser.parseCacheHeaders(response));
         }
 
         @Override
         protected void deliverResponse(RasterProtos.Raster response) {
-            Log.d("Volley ", "Received " + sampleCount + "Points for key:" + key);
+            Log.d("Volley ", "Received " + sampleCount + " Points for key:" + key);
+        }
+
+        @Override
+        public boolean equals(Object obj){
+            SampleProtoRequest request = (SampleProtoRequest) obj;
+            return key.equals(request.key);
+        }
+
+        @Override
+        public int hashCode(){
+            return key.hashCode();
         }
     }
 }

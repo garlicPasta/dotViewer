@@ -1,7 +1,6 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import java.nio.FloatBuffer;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +22,17 @@ public class LRUDrawableCache {
         return map.containsKey(id);
     }
 
+    public synchronized void set(DrawableBufferNode node) {
+        if(map.containsKey(node.key)) {
+            DrawableBufferNode old = map.get(node.key);
+            remove(old);
+        }
+        while (currentPointCount + (node.pointCount) > MAX_POINTS) {
+            remove(end);
+        }
+        setHead(node);
+    }
+
     public synchronized void set(String key, FloatBuffer vertices, FloatBuffer colors,
                                  FloatBuffer size) {
         if(map.containsKey(key)) {
@@ -37,7 +47,7 @@ public class LRUDrawableCache {
         }
     }
 
-    private synchronized void remove(DrawableBufferNode n){
+    protected synchronized void remove(DrawableBufferNode n){
         if(n.pre!=null)
             n.pre.next = n.next;
         else
@@ -68,10 +78,23 @@ public class LRUDrawableCache {
 
     public void draw(int aPositionLocation, int aColorLocation, int aSizeLocation) {
         for (DrawableBufferNode node : map.values()){
+            if (node.isDrawable()){
                 node.bindVertex(aPositionLocation);
                 node.bindColor(aColorLocation);
                 node.bindSize(aSizeLocation);
                 node.draw();
+            }
         }
+    }
+
+    public DrawableBufferNode getNode(String id){
+        return map.get(id);
+    }
+
+    public void updatePointCount(int points){
+        while (currentPointCount + points > MAX_POINTS){
+            remove(end);
+        }
+        currentPointCount =+ points;
     }
 }

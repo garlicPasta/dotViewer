@@ -11,7 +11,7 @@ import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGLOwn
 public class DataAccessLayer {
     public static final String SERVER_IP = "192.168.2.104:8080";
 
-    RequestQueue queue;
+    public RequestQueue queue;
 
     public DataAccessLayer(Context c){
         this.queue = Volley.newRequestQueue(c);

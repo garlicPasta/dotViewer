@@ -17,11 +17,20 @@ public class DrawableBufferNode {
     String key;
     DrawableBufferNode pre;
     DrawableBufferNode next;
-    FloatBuffer vertexBuffer;
-    FloatBuffer colorBuffer;
-    FloatBuffer sizeBuffer;
+    private FloatBuffer vertexBuffer;
+    private FloatBuffer colorBuffer;
+    private FloatBuffer sizeBuffer;
     public int pointCount;
 
+    public DrawableBufferNode(String key){
+        this.key = key;
+        pointCount = 0;
+    }
+
+    public DrawableBufferNode(String key, int sampleCount){
+        this.key = key;
+        pointCount = sampleCount;
+    }
 
     public DrawableBufferNode(String key, FloatBuffer vertices, FloatBuffer colors, FloatBuffer size){
         this.key = key;
@@ -51,5 +60,25 @@ public class DrawableBufferNode {
 
     public void draw(){
         glDrawArrays(GL_POINTS, 0, pointCount);
+    }
+
+    public void setVertexBuffer(FloatBuffer vertexBuffer) {
+        this.vertexBuffer = vertexBuffer;
+    }
+
+    public void setColorBuffer(FloatBuffer colorBuffer) {
+        this.colorBuffer = colorBuffer;
+    }
+
+    public void setSizeBuffer(FloatBuffer sizeBuffer) {
+        this.sizeBuffer = sizeBuffer;
+    }
+
+    public void setPointCount(int pointCount) {
+        this.pointCount = pointCount;
+    }
+
+    public boolean isDrawable(){
+        return vertexBuffer != null && colorBuffer != null && sizeBuffer != null;
     }
 }
