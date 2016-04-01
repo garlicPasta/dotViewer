@@ -4,12 +4,13 @@ import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAccessLayer;
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DrawableBufferNode;
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.LRUDrawableCache;
 
+import java.util.List;
+
 
 public class RemotePointClusterGL extends ModelGl implements MultiResolutionTreeGLOwner{
-    MultiResolutionTreeGL mrt;
-    DataAccessLayer dal;
-    LRUDrawableCache cache;
-
+    private MultiResolutionTreeGL mrt;
+    private DataAccessLayer dal;
+    private LRUDrawableCache cache;
 
 
     public RemotePointClusterGL(DataAccessLayer d){
@@ -21,7 +22,9 @@ public class RemotePointClusterGL extends ModelGl implements MultiResolutionTree
 
     public void updateCache(CameraGL camera){
         if (mrt != null) {
-            for (String id : mrt.getIdsMaxLevel(6)) {
+            List<String> activeIds = mrt.getIdsMaxLevel(6);
+            cache.setActiveNodes(activeIds);
+            for (String id : activeIds) {
                 if (!cache.containsSample(id)){
                     cache.set(new DrawableBufferNode(id));
                     dal.getSamples(id, cache);
@@ -32,7 +35,20 @@ public class RemotePointClusterGL extends ModelGl implements MultiResolutionTree
 
     @Override
     public void draw() {
-        cache.draw(aPositionLocation, aColorLocation, aSizeLocation);
+        if (mrt != null) {
+            cache.drawActiveNodes(aPositionLocation, aColorLocation, aSizeLocation);
+            //drawActiveOctans();
+        }
+
+    }
+
+    public void drawActiveOctans(){
+        for (BoxGL box : mrt.exportActiceNodes()){
+            box.bindVertex(aPositionLocation);
+            box.bindColor(aColorLocation);
+            box.bindSize(aSizeLocation);
+            box.draw();
+        }
     }
 
     @Override

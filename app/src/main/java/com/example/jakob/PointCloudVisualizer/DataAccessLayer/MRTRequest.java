@@ -7,6 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.example.jakob.PointCloudVisualizer.GlObjects.ModelGl;
 import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGLOwner;
 import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGL;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -48,7 +49,7 @@ public class MRTRequest {
 
         @Override
         protected void deliverResponse(MultiResTreeProtos.MRTree tree) {
-            MultiResolutionTreeGL remote = new MultiResolutionTreeGL(tree);
+            MultiResolutionTreeGL remote = new MultiResolutionTreeGL(tree, (ModelGl) owner);
             owner.setMultiResolutionTree(remote);
             //scene.addModels(octree.exportChildren());
         }

@@ -41,7 +41,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     private int mProgram;
 
     private Scene scene;
-    private PolyIndexBufferModelGL cube;
+    CameraGL camera;
     private FPSCounter fpsCounter;
     private DataAccessLayer dal;
 
@@ -71,7 +71,9 @@ public class GLRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
+        camera = new CameraGL();
         scene = new Scene(gl);
+        scene.setCamera(camera);
         scene.addModel(new RemotePointClusterGL(dal));
     }
 
@@ -86,7 +88,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         float ratio = (float) width / height;
-        scene.setCamera(new CameraGL(ratio));
+        camera.updateRation(ratio);
     }
 
     @Override

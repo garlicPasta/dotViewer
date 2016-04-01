@@ -11,6 +11,7 @@ public abstract class ModelGl {
     protected float[] scaleMatrix;
     protected float[] centerMatrix;
 
+    protected CameraGL camera;
     protected float scale;
 
     public int aPositionLocation;
@@ -53,6 +54,10 @@ public abstract class ModelGl {
         scaleMatrix[0]= scale;
         scaleMatrix[5]= scale;
         scaleMatrix[10]= scale;
+    }
+
+    public void setCamera(CameraGL camera) {
+        this.camera = camera;
     }
 
     public abstract void draw();

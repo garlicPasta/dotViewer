@@ -1,6 +1,8 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import java.nio.FloatBuffer;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,6 +15,7 @@ public class LRUDrawableCache {
     private int currentPointCount;
 
     Map<String, DrawableBufferNode> map = new ConcurrentHashMap<>();
+    List<String> activeNodes;
     DrawableBufferNode head=null;
     DrawableBufferNode end=null;
 
@@ -76,15 +79,33 @@ public class LRUDrawableCache {
         map.put(n.key, n);
     }
 
-    public void draw(int aPositionLocation, int aColorLocation, int aSizeLocation) {
+    public void drawAll(int aPositionLocation, int aColorLocation, int aSizeLocation) {
         for (DrawableBufferNode node : map.values()){
-            if (node.isDrawable()){
-                node.bindVertex(aPositionLocation);
-                node.bindColor(aColorLocation);
-                node.bindSize(aSizeLocation);
-                node.draw();
-            }
+            drawNode(node, aPositionLocation, aColorLocation, aSizeLocation);
         }
+    }
+
+    public void drawIds(int aPositionLocation, int aColorLocation, int aSizeLocation,
+                        List<String> ids) {
+        for (String id : ids){
+            drawNode(map.get(id), aPositionLocation, aColorLocation, aSizeLocation);
+        }
+    }
+
+    public void drawActiveNodes(int aPositionLocation, int aColorLocation, int aSizeLocation){
+        if (activeNodes != null)
+            drawIds(aPositionLocation, aColorLocation, aSizeLocation, activeNodes);
+    }
+
+    private void drawNode(DrawableBufferNode node, int aPositionLocation, int aColorLocation,
+                          int aSizeLocation){
+        if (node != null && node.isDrawable()){
+            node.bindVertex(aPositionLocation);
+            node.bindColor(aColorLocation);
+            node.bindSize(aSizeLocation);
+            node.draw();
+        }
+
     }
 
     public DrawableBufferNode getNode(String id){
@@ -96,5 +117,9 @@ public class LRUDrawableCache {
             remove(end);
         }
         currentPointCount =+ points;
+    }
+
+    public void setActiveNodes(List<String> activeNodes) {
+        this.activeNodes = activeNodes;
     }
 }

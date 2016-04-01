@@ -29,6 +29,8 @@ dependencies {
             'com.mcxiaoke.volley:library-aar:1.0.0',
             [group: 'com.google.guava', name: 'guava', version: '12.0'],
             'com.google.protobuf:protobuf-java:3.0.0-beta-2',
+            'math.geom2d:javaGeom:0.11.1',
+
     )
     androidTestCompile 'junit:junit:4.12'
 }

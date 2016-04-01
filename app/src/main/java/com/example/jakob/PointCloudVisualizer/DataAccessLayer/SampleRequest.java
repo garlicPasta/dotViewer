@@ -1,7 +1,6 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import android.util.Log;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -10,7 +9,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import java.nio.FloatBuffer;
 
 public class SampleRequest {

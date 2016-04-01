@@ -1,19 +1,19 @@
 package com.example.jakob.PointCloudVisualizer.GlObjects;
 
 
+import android.util.Log;
+
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.MultiResTreeProtos;
 import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
+import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 
 import java.nio.ShortBuffer;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static android.opengl.GLES20.GL_LINES;
-import static android.opengl.GLES20.GL_UNSIGNED_SHORT;
-import static android.opengl.GLES20.glDrawElements;
-import static android.opengl.Matrix.multiplyMM;
 import static android.opengl.Matrix.multiplyMV;
-import static com.example.jakob.PointCloudVisualizer.util.BufferHelper.buildShortBuffer;
 
 public class MultiResolutionTreeGL {
 
@@ -45,15 +45,16 @@ public class MultiResolutionTreeGL {
 
         private float[][] calculateEdgePoints() {
             float[] sign = {-1, 1};
-            float[] vec = {center[0]/2, center[1]/2, center[2]/3};
-            float [][] edges = new float[8][3];
+            float delta = length / 2;
+            float [][] edges = new float[8][4];
             for (int i=0; i<2; i++){
                 for (int j=0; j<2; j++){
                     for (int k=0; k<2; k++){
                         edges[4*i + 2*j + k] = new float[]{
-                                center[0] + sign[i] * vec[0],
-                                center[1] + sign[j] * vec[1],
-                                center[2] + sign[k] * vec[2]
+                                center[0] + sign[i] * delta,
+                                center[1] + sign[j] * delta,
+                                center[2] + sign[k] * delta,
+                                1
                             };
                     }
                 }
@@ -69,17 +70,46 @@ public class MultiResolutionTreeGL {
             }
         }
 
-        public boolean isVisible(CameraGL c, ModelGl m){
-            float[] MVmatrix = new float[16];
-            multiplyMM(MVmatrix, 0, c.viewMatrix, 0, m.getModelMatrix(), 0);
-            float[] projectedPoint = new float[4];
-            for (float[] edgePoint : edgePoints){
-                multiplyMV(projectedPoint, 0, MVmatrix, 0, edgePoint, 0);
-                if (projectedPoint[0] > -1 && projectedPoint[0] < 1 &&
-                        projectedPoint[1] > -1 && projectedPoint[1] < 1)
-                    return true;
+        public boolean isVisible(ModelGl m){
+            float[] mvpMatrix = new float[16];
+            MatrixHelper.multMatrices(
+                    mvpMatrix,
+                    m.camera.projectionMatrix,
+                    m.camera.viewMatrix,
+                    m.getModelMatrix()
+            );
+
+            float[][] projectedPoint = new float[8][4];
+            for (int i = 0; i < edgePoints.length; i++) {
+                float[] point = edgePoints[i];
+                multiplyMV(projectedPoint[i], 0, mvpMatrix, 0, point, 0);
             }
-            return false;
+            float[] boundingBox = getBoundingBox(projectedPoint);
+            return rectangleIntersept(boundingBox);
+        }
+
+        private boolean rectangleIntersept(float[] box1){
+            return  !(box1[0] + box1[2] < -.5 ||  .5 < box1[0] ||
+                      box1[1] - box1[3] > .5 || -.5 > box1[1]);
+        }
+
+
+        /**
+         * @param points
+         * @return return top left point and width and height
+         */
+        private float[] getBoundingBox(float[][] points){
+            float minX = points[0][0];
+            float maxX = points[0][0];
+            float minY = points[0][1];
+            float maxY = points[0][1];
+            for (float[] p: points){
+                minX = Math.min(minX, p[0]);
+                minY = Math.min(minY, p[1]);
+                maxX = Math.max(maxX, p[0]);
+                maxY = Math.max(maxY, p[1]);
+            }
+            return new float[]{minX, maxY, maxX - minX, maxY - minY};
         }
 
         public float getDetailFactor(CameraGL c){
@@ -89,9 +119,13 @@ public class MultiResolutionTreeGL {
 
 
     public OctreeNodeGL root;
+    public Queue<OctreeNodeGL> activeNodes;
+    ModelGl owner;
 
-    public MultiResolutionTreeGL(MultiResTreeProtos.MRTree tree){
+    public MultiResolutionTreeGL(MultiResTreeProtos.MRTree tree, ModelGl owner){
         root = new OctreeNodeGL(tree.getRoot());
+        activeNodes = new ConcurrentLinkedQueue<>();
+        this.owner = owner;
     }
 
     public void draw(){
@@ -135,6 +169,7 @@ public class MultiResolutionTreeGL {
 
     public List<String> getIdsMaxLevel(int level){
         List<String> ids = new LinkedList<>();
+        activeNodes = new ConcurrentLinkedQueue<>();
         _getIdsMaxLevel(root, ids, level);
         return ids;
     }
@@ -143,12 +178,16 @@ public class MultiResolutionTreeGL {
         if (currentNode == null)
             return;
         if (currentNode.isLeaf || level == 0){
-            if (currentNode.pointCount > 0)
+            if (currentNode.pointCount > 0) {
                 ids.add(currentNode.id);
+                activeNodes.add(currentNode);
+            }
             return;
         }
         for (OctreeNodeGL node : currentNode.octants ) {
-            _getIdsMaxLevel(node, ids, level-1);
+            if (node.isVisible(owner)) {
+                _getIdsMaxLevel(node, ids, level - 1);
+            }
         }
     }
 
@@ -209,5 +248,12 @@ public class MultiResolutionTreeGL {
         for (OctreeNodeGL node : currentNode.octants ) {
             _exportChildren(node, children);
         }
+    }
+
+    public List<BoxGL> exportActiceNodes(){
+        List<BoxGL> boxes = new LinkedList<>();
+        for (OctreeNodeGL node : activeNodes)
+            boxes.add(node.box);
+        return boxes;
     }
 }

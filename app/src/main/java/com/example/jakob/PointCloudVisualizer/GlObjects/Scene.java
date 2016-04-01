@@ -30,7 +30,6 @@ public class Scene {
         drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
         for (int i = 0; i < sceneModels.size(); i++) {
             ModelGl model = sceneModels.get(i);
-            Matrix.setIdentityM(mvpMatrix, 0);
             MatrixHelper.multMatrices(
                     mvpMatrix,
                     camera.projectionMatrix,
@@ -46,6 +45,7 @@ public class Scene {
     }
 
     public synchronized void addModel(ModelGl models){
+        models.setCamera(camera);
         sceneModels.add(models);
     }
 
