@@ -4,10 +4,8 @@ package com.example.jakob.PointCloudVisualizer.GlObjects;
 import android.util.Log;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.MultiResTreeProtos;
-import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
 import com.example.jakob.PointCloudVisualizer.util.MatrixHelper;
 
-import java.nio.ShortBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -17,7 +15,9 @@ import static android.opengl.Matrix.multiplyMV;
 
 public class MultiResolutionTreeGL {
 
-    public class OctreeNodeGL {
+    public static final float DETAIL_FACTOR = 2.5f;
+
+    private class OctreeNodeGL {
         public String id;
         boolean isLeaf;
         int pointCount;
@@ -33,7 +33,7 @@ public class MultiResolutionTreeGL {
             pointCount = node.getPointCount();
             center = new float[]{(float) node.getCenter(0),
                     (float) node.getCenter(1),
-                    (float) node.getCenter(2)};
+                    (float) node.getCenter(2), 1};
             length = (float) node.getCellLength();
             box = new BoxGL(center, length);
             for (int i=0; i < node.getOctantCount(); i++){
@@ -71,28 +71,64 @@ public class MultiResolutionTreeGL {
         }
 
         public boolean isVisible(ModelGl m){
-            float[] mvpMatrix = new float[16];
-            MatrixHelper.multMatrices(
-                    mvpMatrix,
+            float[] boundingBox = getBoundingBox(projectPoints(edgePoints,
                     m.camera.projectionMatrix,
                     m.camera.viewMatrix,
-                    m.getModelMatrix()
-            );
+                    m.getModelMatrix()));
+            return rectangleIntersept(boundingBox) && isVisibleZ(m);
+        }
 
-            float[][] projectedPoint = new float[8][4];
-            for (int i = 0; i < edgePoints.length; i++) {
-                float[] point = edgePoints[i];
-                multiplyMV(projectedPoint[i], 0, mvpMatrix, 0, point, 0);
+        private boolean isVisibleZ(ModelGl m){
+            for (float[] edge : edgePoints){
+                float[] proEdge = projectPoint(edge,
+                        m.camera.projectionMatrix,
+                        m.camera.viewMatrix,
+                        m.getModelMatrix());
+                if (proEdge[2] < 1)
+                    return true;
             }
-            float[] boundingBox = getBoundingBox(projectedPoint);
-            return rectangleIntersept(boundingBox);
+            return false;
         }
 
         private boolean rectangleIntersept(float[] box1){
-            return  !(box1[0] + box1[2] < -.5 ||  .5 < box1[0] ||
-                      box1[1] - box1[3] > .5 || -.5 > box1[1]);
+            return  !(box1[0] + box1[2] < -.9 ||  .9 < box1[0] ||
+                      box1[1] - box1[3] > .9 || -.9 > box1[1]);
         }
 
+
+
+        private float[][] projectPoints(float[][] points, float[] projectionMatrix,
+                                       float[] viewMatrix, float[] modelMatrix){
+            float[] mvpMatrix = new float[16];
+            MatrixHelper.multMatrices(
+                    mvpMatrix,
+                    projectionMatrix,
+                    viewMatrix,
+                    modelMatrix
+            );
+
+            float[][] projectedPoints = new float[8][4];
+            for (int i = 0; i < edgePoints.length; i++) {
+                float[] point = edgePoints[i];
+                multiplyMV(projectedPoints[i], 0, mvpMatrix, 0, point, 0);
+            }
+            return projectedPoints;
+        }
+
+        private float[] projectPoint(float[] point, float[] projectionMatrix,
+                                        float[] viewMatrix, float[] modelMatrix){
+            float[] mvpMatrix = new float[16];
+            MatrixHelper.multMatrices(
+                    mvpMatrix,
+                    projectionMatrix,
+                    viewMatrix,
+                    modelMatrix
+            );
+
+            float[] projectedPoint = new float[4];
+            multiplyMV(projectedPoint, 0, mvpMatrix, 0, point, 0);
+            return projectedPoint;
+        }
 
         /**
          * @param points
@@ -112,9 +148,32 @@ public class MultiResolutionTreeGL {
             return new float[]{minX, maxY, maxX - minX, maxY - minY};
         }
 
-        public float getDetailFactor(CameraGL c){
-            return 0;
+        public float getDetailFactor(ModelGl m){
+            float[] boundingBox = getBoundingBox(projectPoints(edgePoints,
+                    m.camera.projectionMatrix,
+                    m.camera.viewMatrix,
+                    m.getModelMatrix()));
+            float[] centerProj = projectPoint(center,
+                    m.camera.projectionMatrix,
+                    m.camera.viewMatrix,
+                    m.getModelMatrix());
+            float zNorm = centerProj[2];
+            Log.d("Z-Cord", Float.toString(zNorm));
+            return getArea(boundingBox) * 1/(zNorm * zNorm);
         }
+
+        private float euklidDistance(float[][] p){
+            float xcoord = Math.abs (p[0][0] - p[1][0]);
+            float ycoord = Math.abs (p[0][1] - p[1][1]);
+            float zcoord = Math.abs (p[0][2] - p[1][2]);
+            return (float) Math.sqrt(Math.pow(xcoord, 2) +
+                    Math.pow(ycoord, 2) + Math.pow(zcoord,2));
+        }
+
+        private float getArea(float[] boundingBox){
+            return  boundingBox[2] * boundingBox[3];
+        }
+
     }
 
 
@@ -191,21 +250,25 @@ public class MultiResolutionTreeGL {
         }
     }
 
-    public List<String> getIdsConditional(){
+    public List<String> getIdsViewDependent(){
         List<String> ids = new LinkedList<>();
-        _getIdConditional(root, ids);
+        _getIdsViewDependent(root, ids);
         return ids;
     }
 
-    private void _getIdConditional(OctreeNodeGL currentNode, List<String> ids) {
+    private void _getIdsViewDependent(OctreeNodeGL currentNode, List<String> ids) {
         if (currentNode == null)
             return;
-        if ((currentNode.isLeaf)){
+        if ((currentNode.isLeaf || currentNode.getDetailFactor(this.owner) < DETAIL_FACTOR )){
             ids.add(currentNode.id);
             return;
         }
 
-
+        for (OctreeNodeGL node : currentNode.octants ) {
+            if (node.isVisible(owner) && node.pointCount > 0) {
+                _getIdsViewDependent(node, ids);
+            }
+        }
     }
 
     /**

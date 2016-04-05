@@ -43,6 +43,8 @@ public class SampleRequest {
 
         @Override
         protected Response<RasterProtos.Raster> parseNetworkResponse(NetworkResponse response) {
+            if (!cache.activeNodes.contains(key))
+                return null;
             DrawableBufferNode node = cache.getNode(key);
 
             RasterProtos.Raster raster = null;
@@ -91,6 +93,12 @@ public class SampleRequest {
         public boolean equals(Object obj){
             SampleProtoRequest request = (SampleProtoRequest) obj;
             return key.equals(request.key);
+        }
+
+        @Override
+        public void cancel(){
+            super.cancel();
+            cache.remove(cache.getNode(key));
         }
 
         @Override

@@ -22,7 +22,7 @@ public class RemotePointClusterGL extends ModelGl implements MultiResolutionTree
 
     public void updateCache(CameraGL camera){
         if (mrt != null) {
-            List<String> activeIds = mrt.getIdsMaxLevel(6);
+            List<String> activeIds = mrt.getIdsViewDependent();
             cache.setActiveNodes(activeIds);
             for (String id : activeIds) {
                 if (!cache.containsSample(id)){

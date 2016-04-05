@@ -3,6 +3,7 @@ package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import android.content.Context;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGLOwner;
@@ -29,5 +30,14 @@ public class DataAccessLayer {
 
     public void getSamples(String id,LRUDrawableCache cache){
         SampleRequest.sendRequest(id, queue, cache);
+    }
+
+    public void cancelAllRequest(){
+        queue.cancelAll(new RequestQueue.RequestFilter() {
+            @Override
+            public boolean apply(Request<?> request) {
+                return true;
+            }
+        });
     }
 }
