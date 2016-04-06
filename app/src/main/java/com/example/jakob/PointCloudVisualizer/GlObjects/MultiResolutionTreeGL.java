@@ -15,7 +15,7 @@ import static android.opengl.Matrix.multiplyMV;
 
 public class MultiResolutionTreeGL {
 
-    public static final float DETAIL_FACTOR = 2.5f;
+    public static final float DETAIL_THRESHOLD = 0.7f;
 
     private class OctreeNodeGL {
         public String id;
@@ -259,7 +259,7 @@ public class MultiResolutionTreeGL {
     private void _getIdsViewDependent(OctreeNodeGL currentNode, List<String> ids) {
         if (currentNode == null)
             return;
-        if ((currentNode.isLeaf || currentNode.getDetailFactor(this.owner) < DETAIL_FACTOR )){
+        if ((currentNode.isLeaf || currentNode.getDetailFactor(this.owner) < DETAIL_THRESHOLD)){
             ids.add(currentNode.id);
             return;
         }
