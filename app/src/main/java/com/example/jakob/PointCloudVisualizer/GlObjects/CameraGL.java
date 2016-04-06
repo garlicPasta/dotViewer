@@ -19,11 +19,11 @@ public class CameraGL {
 
     public CameraGL(float ratio) {
         super();
-        Matrix.orthoM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 150);
+        Matrix.orthoM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 140);
     }
 
     public void updateRation(float ratio){
-        Matrix.orthoM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 150);
+        Matrix.orthoM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 140);
     }
 
     public void rotate(float[] angle){

@@ -20,6 +20,9 @@ public class DrawableBufferNode {
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
     private FloatBuffer sizeBuffer;
+    private FloatBuffer xyzrgbsBuffer;
+    private int stride = (POSITION_COMPONENT_COUNT + COLOR_COMPONENT_COUNT
+            + SIZE_COMPONENT_COUNT) * 4;
     public int pointCount;
 
     public DrawableBufferNode(String key){
@@ -41,37 +44,32 @@ public class DrawableBufferNode {
     }
 
     public void bindVertex(int aPositionLocation){
-        glVertexAttribPointer(aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT,
-                false, 0, this.vertexBuffer);
+        xyzrgbsBuffer.position(0);
         glEnableVertexAttribArray(aPositionLocation);
+        glVertexAttribPointer(aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT,
+                false, stride, this.xyzrgbsBuffer);
     }
 
     public void bindColor(int aColorLocation){
-        glVertexAttribPointer(aColorLocation, COLOR_COMPONENT_COUNT, GL_FLOAT,
-                false, 0, this.colorBuffer);
+        xyzrgbsBuffer.position(POSITION_COMPONENT_COUNT);
         glEnableVertexAttribArray(aColorLocation);
+        glVertexAttribPointer(aColorLocation, COLOR_COMPONENT_COUNT, GL_FLOAT,
+                false, stride, this.xyzrgbsBuffer);
     }
 
     public void bindSize(int aSizeLocation){
-        glVertexAttribPointer(aSizeLocation, SIZE_COMPONENT_COUNT, GL_FLOAT,
-                false, 0, this.sizeBuffer);
+        xyzrgbsBuffer.position(POSITION_COMPONENT_COUNT + COLOR_COMPONENT_COUNT);
         glEnableVertexAttribArray(aSizeLocation);
+        glVertexAttribPointer(aSizeLocation, SIZE_COMPONENT_COUNT, GL_FLOAT,
+                false, stride, this.xyzrgbsBuffer);
     }
 
     public void draw(){
         glDrawArrays(GL_POINTS, 0, pointCount);
     }
 
-    public void setVertexBuffer(FloatBuffer vertexBuffer) {
-        this.vertexBuffer = vertexBuffer;
-    }
-
-    public void setColorBuffer(FloatBuffer colorBuffer) {
-        this.colorBuffer = colorBuffer;
-    }
-
-    public void setSizeBuffer(FloatBuffer sizeBuffer) {
-        this.sizeBuffer = sizeBuffer;
+    public void setXyzrgbsBuffer(FloatBuffer xyzrgbsBuffer) {
+        this.xyzrgbsBuffer = xyzrgbsBuffer;
     }
 
     public void setPointCount(int pointCount) {
@@ -79,6 +77,6 @@ public class DrawableBufferNode {
     }
 
     public boolean isDrawable(){
-        return vertexBuffer != null && colorBuffer != null && sizeBuffer != null;
+        return xyzrgbsBuffer != null;
     }
 }

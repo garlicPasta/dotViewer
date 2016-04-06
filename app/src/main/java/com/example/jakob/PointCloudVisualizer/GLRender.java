@@ -19,6 +19,7 @@ import javax.microedition.khronos.opengles.GL10;
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_CCW;
 import static android.opengl.GLES20.GL_DEPTH_BITS;
+import static android.opengl.GLES20.GL_DEPTH_TEST;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glFrontFace;
 import static android.opengl.GLES20.glGetAttribLocation;
@@ -67,6 +68,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+        //flickering on LG G3
         //gl.glEnable(GL_DEPTH_TEST);
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);

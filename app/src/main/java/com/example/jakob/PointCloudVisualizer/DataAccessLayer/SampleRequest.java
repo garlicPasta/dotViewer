@@ -62,24 +62,20 @@ public class SampleRequest {
             cache.updatePointCount(sampleCount);
             node.setPointCount(sampleCount);
 
-            FloatBuffer vertices = BufferHelper.buildFloatBuffer(3 * sampleCount);
-            FloatBuffer colors = BufferHelper.buildFloatBuffer(3 * sampleCount);
-            FloatBuffer size = BufferHelper.buildFloatBuffer(sampleCount);
+            int bufferSize = 7 * sampleCount;
+
+            FloatBuffer xyzrgbsBuffer = BufferHelper.buildFloatBuffer(bufferSize);
 
             for (RasterProtos.Raster.Point3DRGB p : raster.getSampleList()) {
-                for (int i = 0; i < 3; i++) {
-                    vertices.put(p.getPosition(i));
-                    colors.put(p.getColor(i));
-                }
-                size.put(p.getSize());
+                for (int i = 0; i < 3; i++)
+                    xyzrgbsBuffer.put(p.getPosition(i));
+                for (int i = 0; i < 3; i++)
+                    xyzrgbsBuffer.put(p.getColor(i));
+                xyzrgbsBuffer.put(p.getSize());
             }
-            vertices.rewind();
-            colors.rewind();
-            size.rewind();
 
-            node.setVertexBuffer(vertices);
-            node.setColorBuffer(colors);
-            node.setSizeBuffer(size);
+            xyzrgbsBuffer.rewind();
+            node.setXyzrgbsBuffer(xyzrgbsBuffer);
 
             return Response.success(raster, HttpHeaderParser.parseCacheHeaders(response));
         }
