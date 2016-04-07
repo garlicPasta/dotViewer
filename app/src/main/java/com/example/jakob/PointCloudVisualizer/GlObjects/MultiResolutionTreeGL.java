@@ -15,7 +15,7 @@ import static android.opengl.Matrix.multiplyMV;
 
 public class MultiResolutionTreeGL {
 
-    public static final float DETAIL_THRESHOLD = 0.7f;
+    public static final float DETAIL_THRESHOLD = 1.0f;
 
     private class OctreeNodeGL {
         public String id;
@@ -163,8 +163,8 @@ public class MultiResolutionTreeGL {
         }
 
         private float euklidDistance(float[][] p){
-            float xcoord = Math.abs (p[0][0] - p[1][0]);
-            float ycoord = Math.abs (p[0][1] - p[1][1]);
+            float xcoord = Math.abs(p[0][0] - p[1][0]);
+            float ycoord = Math.abs(p[0][1] - p[1][1]);
             float zcoord = Math.abs (p[0][2] - p[1][2]);
             return (float) Math.sqrt(Math.pow(xcoord, 2) +
                     Math.pow(ycoord, 2) + Math.pow(zcoord,2));
@@ -173,6 +173,7 @@ public class MultiResolutionTreeGL {
         private float getArea(float[] boundingBox){
             return  boundingBox[2] * boundingBox[3];
         }
+
 
     }
 
@@ -280,6 +281,12 @@ public class MultiResolutionTreeGL {
         List<String> ids = new LinkedList<>();
         _getAllIds(root, ids);
         return ids;
+    }
+
+    public List<String> getRootId(){
+        List<String> l = new LinkedList<>();
+        l.add(root.id);
+        return l;
     }
 
     private void _getAllIds(OctreeNodeGL currentNode, List<String> ids){

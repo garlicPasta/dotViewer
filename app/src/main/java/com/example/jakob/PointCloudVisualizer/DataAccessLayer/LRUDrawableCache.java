@@ -1,7 +1,6 @@
 package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,6 +50,7 @@ public class LRUDrawableCache {
     }
 
     protected synchronized void remove(DrawableBufferNode n){
+        n.releaseVBO();
         if(n.pre!=null)
             n.pre.next = n.next;
         else
@@ -99,7 +99,7 @@ public class LRUDrawableCache {
 
     private void drawNode(DrawableBufferNode node, int aPositionLocation, int aColorLocation,
                           int aSizeLocation){
-        if (node != null && node.isDrawable()){
+        if (node != null && node.isVBO()){
             node.bindVertex(aPositionLocation);
             node.bindColor(aColorLocation);
             node.bindSize(aSizeLocation);
