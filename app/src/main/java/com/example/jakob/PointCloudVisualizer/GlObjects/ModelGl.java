@@ -56,6 +56,10 @@ public abstract class ModelGl {
         scaleMatrix[10]= scale;
     }
 
+    public void translate(float[] trans){
+        Matrix.translateM(transMatrix, 0, trans[0], trans[1], trans[2]);
+    }
+
     public void setCamera(CameraGL camera) {
         this.camera = camera;
     }

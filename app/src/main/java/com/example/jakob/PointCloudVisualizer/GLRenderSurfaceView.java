@@ -105,7 +105,7 @@ public class GLRenderSurfaceView extends GLSurfaceView  {
             if (e2.getPointerCount() == 2){
                 Log.d(DEBUG_TAG, "2Finger scroll: " + e1.toString() + e2.toString());
                 Log.d(DEBUG_TAG, "2Finger scroll: " + distanceX + distanceY);
-                mRenderer.addToTranslation(new float[]{distanceX, distanceY, 0});
+                //mRenderer.addToTranslation(new float[]{distanceX/10, distanceY/10, 0});
             }else {
                 Log.d(DEBUG_TAG, "onScroll: " + e1.toString() + e2.toString());
                 if (Math.abs(distanceX) > Math.abs(distanceY)) {
@@ -152,7 +152,7 @@ public class GLRenderSurfaceView extends GLSurfaceView  {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             mScaleFactor *= detector.getScaleFactor();
-            mScaleFactor = Math.max(0.01f, Math.min(mScaleFactor, 100.0f));
+            mScaleFactor = Math.max(0.001f, Math.min(mScaleFactor, 1000.0f));
             mRenderer.setScale(mScaleFactor);
             Log.v("ScaleListeneer", String.valueOf(mScaleFactor));
             invalidate();

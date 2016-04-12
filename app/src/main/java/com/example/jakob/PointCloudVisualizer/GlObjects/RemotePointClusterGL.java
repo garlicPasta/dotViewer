@@ -39,12 +39,15 @@ public class RemotePointClusterGL extends ModelGl implements MultiResolutionTree
                     cache.setActiveNodes(activeIds);
                     for (String id : activeIds) {
                         if (!cache.containsSample(id)){
+                            if(executor.getQueue().size() > 0)
+                                return;
                             cache.set(new DrawableBufferNode(id));
                             dal.getSamples(id, cache);
                         }
                     }
                 }
             });
+            executor.getQueue();
         }
     }
 

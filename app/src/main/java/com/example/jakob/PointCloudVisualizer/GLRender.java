@@ -121,9 +121,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     }
 
     public void addToTranslation(float[] translation) {
-        for (int i=0; i< this.translation.length ; i++){
-            this.translation[i] += translation[i];
-        }
+        scene.translateScene(translation);
     }
 
     public float[] getRotation() {

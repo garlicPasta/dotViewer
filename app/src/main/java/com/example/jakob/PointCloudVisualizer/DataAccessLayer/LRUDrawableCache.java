@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LRUDrawableCache {
 
-    static int POINT_COUNT = 500000;
+    static int POINT_COUNT = 100000;
     static int BLOCK_COUNT = 1;
     public static int MAX_POINTS = POINT_COUNT * BLOCK_COUNT;
 
@@ -35,22 +35,9 @@ public class LRUDrawableCache {
         setHead(node);
     }
 
-    public synchronized void set(String key, FloatBuffer vertices, FloatBuffer colors,
-                                 FloatBuffer size) {
-        if(map.containsKey(key)) {
-            DrawableBufferNode old = map.get(key);
-            remove(old);
-        }
-        if (currentPointCount + (vertices.capacity() / 3) < MAX_POINTS) {
-            DrawableBufferNode created = new DrawableBufferNode(key, vertices, colors, size);
-            setHead(created);
-        } else {
-            remove(end);
-        }
-    }
-
     protected synchronized void remove(DrawableBufferNode n){
-        n.releaseVBO();
+        if (n.isVBO)
+            n.releaseVBO();
         if(n.pre!=null)
             n.pre.next = n.next;
         else

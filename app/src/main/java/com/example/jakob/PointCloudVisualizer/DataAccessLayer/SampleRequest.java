@@ -8,8 +8,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.example.jakob.PointCloudVisualizer.util.BufferHelper;
+import com.example.jakob.PointCloudVisualizer.util.CompressionUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.zip.DataFormatException;
 
 public class SampleRequest {
 
@@ -44,13 +48,17 @@ public class SampleRequest {
         @Override
         protected Response<RasterProtos.Raster> parseNetworkResponse(NetworkResponse response) {
             if (!cache.activeNodes.contains(key))
-                return null;
+                return Response.success(null, HttpHeaderParser.parseCacheHeaders(response));
             DrawableBufferNode node = cache.getNode(key);
 
             RasterProtos.Raster raster = null;
             try {
-                raster = RasterProtos.Raster.parseFrom(response.data);
+                raster = RasterProtos.Raster.parseFrom(CompressionUtils.decompress(response.data));
             } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            } catch (DataFormatException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -82,6 +90,8 @@ public class SampleRequest {
 
         @Override
         protected void deliverResponse(RasterProtos.Raster response) {
+            if (response == null)
+                cache.remove(cache.getNode(key));
             Log.d("Volley ", "Received " + sampleCount + " Points for key:" + key);
         }
 

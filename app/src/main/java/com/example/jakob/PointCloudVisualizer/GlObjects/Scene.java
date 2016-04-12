@@ -84,4 +84,9 @@ public class Scene {
         for (ModelGl m : sceneModels)
             m.scale(scale);
     }
+
+    public void translateScene(float[] trans){
+        for (ModelGl m : sceneModels)
+            m.translate(trans);
+    }
 }
