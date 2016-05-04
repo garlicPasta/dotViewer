@@ -2,42 +2,44 @@ package com.example.jakob.PointCloudVisualizer.DataAccessLayer;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.jakob.PointCloudVisualizer.GlObjects.MultiResolutionTreeGLOwner;
 
+import java.security.InvalidKeyException;
+
 
 public class DataAccessLayer {
-    public static final String SERVER_IP = "192.168.2.104:8080";
+    public String serverUrl;
 
     public RequestQueue queue;
 
     public DataAccessLayer(Context c){
         this.queue = Volley.newRequestQueue(c);
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(c);
+        try {
+            serverUrl = p.getString("serverIP", "InvalidKey");
+            if (serverUrl.equals("InvalidKey")){
+            throw new InvalidKeyException("No IP address specified for server");
+            }
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
     }
 
-    /*
-    public LRUCache buildLRUCache(){
-        return new LRUCache(queue);
-    };
-    */
-
     public void buildMultiResTreeProtos(MultiResolutionTreeGLOwner owner) {
-        MRTRequest.sendRequest(queue, owner);
+        MRTRequest.sendRequest(serverUrl, queue, owner);
     }
 
     public void getSamples(String id,LRUDrawableCache cache){
-        SampleRequest.sendRequest(id, queue, cache);
+        SampleRequest.sendRequest(serverUrl, id, queue, cache);
     }
 
-    public void cancelAllRequest(){
-        queue.cancelAll(new RequestQueue.RequestFilter() {
-            @Override
-            public boolean apply(Request<?> request) {
-                return true;
-            }
-        });
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 }

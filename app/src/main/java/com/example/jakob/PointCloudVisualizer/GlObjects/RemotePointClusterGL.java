@@ -16,7 +16,7 @@ public class RemotePointClusterGL extends ModelGl implements MultiResolutionTree
     private MultiResolutionTreeGL mrt;
     private DataAccessLayer dal;
     private LRUDrawableCache cache;
-    ThreadPoolExecutor executor;
+    private ThreadPoolExecutor executor;
 
 
     public RemotePointClusterGL(DataAccessLayer d){

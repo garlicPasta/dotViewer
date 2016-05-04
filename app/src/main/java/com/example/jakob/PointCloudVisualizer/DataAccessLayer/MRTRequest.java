@@ -15,9 +15,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class MRTRequest {
 
-    static public void sendRequest(RequestQueue rQ, MultiResolutionTreeGLOwner owner){
+    static public void sendRequest(String url, RequestQueue rQ, MultiResolutionTreeGLOwner owner){
         ProtoRequest request = new ProtoRequest(Request.Method.GET,
-                QueryFactory.buildMRTQuery().toString(),
+                QueryFactory.buildMRTQuery(url).toString(),
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {

@@ -1,0 +1,22 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="192.168.2.1"
+        android:inputType="textCapWords"
+        android:key="serverIP"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Server IP" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="5.0"
+        android:inputType="number"
+        android:key="detailThreshold"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Detail Threshold" />
+</PreferenceScreen>

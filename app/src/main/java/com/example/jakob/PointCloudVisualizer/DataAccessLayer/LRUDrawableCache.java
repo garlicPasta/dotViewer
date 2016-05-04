@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LRUDrawableCache {
 
-    static int POINT_COUNT = 100000;
+    static int POINT_COUNT = 500000;
     static int BLOCK_COUNT = 1;
     public static int MAX_POINTS = POINT_COUNT * BLOCK_COUNT;
 

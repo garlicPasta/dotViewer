@@ -1,5 +1,6 @@
 package com.example.jakob.PointCloudVisualizer;
 
+import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -38,23 +39,10 @@ public class BasicActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         }
-        if (id == R.id.load_model) {
-            CharSequence text = "Lets load a model!";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this, text, duration);
-            toast.show();
-            return true;
-        }
-        if (id == R.id.center_model) {
-            CharSequence text = "Lets load a model!";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this, text, duration);
-            toast.show();
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

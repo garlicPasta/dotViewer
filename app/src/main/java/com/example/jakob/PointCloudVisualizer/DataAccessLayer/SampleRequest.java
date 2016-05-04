@@ -17,10 +17,10 @@ import java.util.zip.DataFormatException;
 
 public class SampleRequest {
 
-    static public void sendRequest(final String id, RequestQueue rQ, final LRUDrawableCache cache){
+    static public void sendRequest(final String url, final String id, RequestQueue rQ, final LRUDrawableCache cache){
         SampleProtoRequest request = new SampleProtoRequest(
                 Request.Method.GET,
-                QueryFactory.buildSampleQuery(id).toString(),
+                QueryFactory.buildSampleQuery(url,id).toString(),
                 id,
                 cache,
                 new Response.ErrorListener() {

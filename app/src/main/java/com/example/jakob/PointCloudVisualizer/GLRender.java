@@ -1,8 +1,11 @@
 package com.example.jakob.PointCloudVisualizer;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.example.jakob.PointCloudVisualizer.DataAccessLayer.DataAccessLayer;
 import com.example.jakob.PointCloudVisualizer.GlObjects.CameraGL;
@@ -73,6 +76,8 @@ public class GLRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
+        dal.setServerUrl(PreferenceManager.getDefaultSharedPreferences(context).getString("serverIP",
+                "Invalid IP"));
         camera = new CameraGL();
         scene = new Scene(gl);
         scene.setCamera(camera);
@@ -99,7 +104,8 @@ public class GLRender implements GLSurfaceView.Renderer {
         glClear(GL_DEPTH_BITS);
         glFrontFace(GL_CCW);
         scene.drawScene(aPositionLocation, aColorLocation, aSizeLocation, uMVPMatrixLocation);
-        fpsCounter.logFrame();
+        //fpsCounter.logFrame();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
     }
 
     public int createOpenGlProgram(){
