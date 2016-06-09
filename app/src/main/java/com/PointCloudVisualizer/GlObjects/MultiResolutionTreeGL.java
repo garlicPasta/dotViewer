@@ -13,7 +13,7 @@ import static android.opengl.Matrix.multiplyMV;
 
 public class MultiResolutionTreeGL {
 
-    public static final float DETAIL_THRESHOLD = 8.0f;
+    public static final float DETAIL_THRESHOLD = 4.0f;
 
     public class OctreeNodeGL {
         public String id;

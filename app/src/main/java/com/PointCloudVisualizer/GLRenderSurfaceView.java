@@ -153,7 +153,7 @@ public class GLRenderSurfaceView extends GLSurfaceView  {
             float scaleDelta = detector.getScaleFactor();
             mScaleFactor *= scaleDelta;
             if (mScaleFactor < 0.001f || mScaleFactor > 1000f) {
-                mScaleFactor = Math.max(0.001f, Math.min(mScaleFactor, 1000f));
+                mScaleFactor = Math.max(0.001f, Math.min(mScaleFactor, 10000f));
                 return false;
             }
             //mScaleFactor = Math.max(0.001f, Math.min(mScaleFactor, 1000.0f));
