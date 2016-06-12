@@ -3,11 +3,8 @@
 DotViewer is an Android Application for displaying and exploring 
 huge Pointclouds.
 
-DotViewer and dotServer form a client-server system which is able
-to manage pointcloud with more than 30 million points.
-
-![example_picture]("https://raw.githubusercontent.com/garlicPasta/AndroidPointCloudVisualizer/master/readme/img/bstelle_mid4.png")
-![example_picture2]("https://raw.githubusercontent.com/garlicPasta/AndroidPointCloudVisualizer/master/readme/img/close_terra1.png")
+![example_picture](https://raw.githubusercontent.com/garlicPasta/AndroidPointCloudVisualizer/master/readme/img/bstelle_mid4.png)
+![example_picture2](https://raw.githubusercontent.com/garlicPasta/AndroidPointCloudVisualizer/master/readme/img/close_terra1.png)
 
 
 ## Dependencies 
