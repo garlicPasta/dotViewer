@@ -22,6 +22,12 @@ android {
     }
 }
 
+task generateProto(type:Exec) {
+    workingDir './src/main/java'
+    commandLine 'protoc', 'com/PointCloudVisualizer/proto/Raster.proto',
+            'com/PointCloudVisualizer/proto/MultiResolutionTree.proto','--java_out=.'
+}
+
 dependencies {
     compile(
             fileTree(dir: 'libs', include: ['*.jar']),
@@ -30,8 +36,7 @@ dependencies {
             [group: 'com.google.guava', name: 'guava', version: '12.0'],
             'com.google.protobuf:protobuf-java:3.0.0-beta-2',
             'math.geom2d:javaGeom:0.11.1',
-
+            'com.android.support:support-v4:22.2.1',
     )
     androidTestCompile 'junit:junit:4.12'
-    compile 'com.android.support:support-v4:22.2.1'
 }
