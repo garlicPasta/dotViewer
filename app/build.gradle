@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.PointCloudVisualizer"
-        minSdkVersion 10
+        minSdkVersion 11
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -37,6 +37,7 @@ dependencies {
             'com.google.protobuf:protobuf-java:3.0.0-beta-2',
             'math.geom2d:javaGeom:0.11.1',
             'com.android.support:support-v4:22.2.1',
+            'com.rarepebble:colorpicker:2.0.0'
     )
     androidTestCompile 'junit:junit:4.12'
 }

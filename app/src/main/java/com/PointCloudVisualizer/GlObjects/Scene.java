@@ -27,7 +27,6 @@ public class Scene {
 
     public void drawScene(int aPositionLocation, int aColorLocation,
                           int aSizeLocation, int uMVPMatrixLocation){
-        drawBackground(aPositionLocation, aColorLocation, uMVPMatrixLocation);
         for (int i = 0; i < sceneModels.size(); i++) {
             ModelGl model = sceneModels.get(i);
             MatrixHelper.multMatrices(

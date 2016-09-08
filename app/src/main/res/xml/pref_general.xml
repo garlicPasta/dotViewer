@@ -19,4 +19,11 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="Detail Threshold" />
+
+    <com.rarepebble.colorpicker.ColorPreference
+            android:key="backgroundColor"
+            android:title="@string/pref_title"
+            android:defaultValue="#000"
+            />
+
 </PreferenceScreen>

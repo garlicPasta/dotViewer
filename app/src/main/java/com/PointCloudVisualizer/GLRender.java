@@ -2,6 +2,7 @@ package com.PointCloudVisualizer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.preference.PreferenceManager;
@@ -21,6 +22,7 @@ import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_CCW;
 import static android.opengl.GLES20.GL_DEPTH_BITS;
 import static android.opengl.GLES20.glClear;
+import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glFrontFace;
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
@@ -99,10 +101,23 @@ public class GLRender implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BITS);
+        float[] backgroundColor = readBackgroundFromSettings();
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glFrontFace(GL_CCW);
         scene.drawScene(aPositionLocation, aColorLocation, aSizeLocation, uMVPMatrixLocation);
         //fpsCounter.logFrame();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
+    }
+
+    private float[] readBackgroundFromSettings() {
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
+        int color = p.getInt("backgroundColor", 0);
+        float[] rgb = new float[4];
+        rgb[0] = Color.red(color) / 255f;
+        rgb[1] = Color.green(color) / 255f;
+        rgb[2] = Color.blue(color) / 255f;
+        rgb[3] = Color.alpha(color) / 255f;
+        return rgb;
     }
 
     public int createOpenGlProgram(){
