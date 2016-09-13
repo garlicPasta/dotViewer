@@ -79,6 +79,15 @@ public class Scene {
             m.rotate(angles);
     }
 
+    public void rotateSceneNoUpdate(float[] angles){
+        for (ModelGl m : sceneModels)
+        if (m instanceof RemotePointClusterGL) {
+            ((RemotePointClusterGL) m).rotateNoUpdate(angles);
+        } else {
+            m.rotate(angles);
+        }
+    }
+
     public void scaleScene(float scale){
         for (ModelGl m : sceneModels)
             m.scale(scale);

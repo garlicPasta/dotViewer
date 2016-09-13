@@ -72,12 +72,17 @@ public class RemotePointClusterGL extends ModelGl implements MultiResolutionTree
     @Override
     public void setMultiResolutionTree(MultiResolutionTreeGL tree) {
         mrt = tree;
+        updateCache();
     }
 
     @Override
     public void rotate(float[] angles){
         super.rotate(angles);
         updateCache();
+    }
+
+    public void rotateNoUpdate(float[] angles){
+        super.rotate(angles);
     }
 
     @Override

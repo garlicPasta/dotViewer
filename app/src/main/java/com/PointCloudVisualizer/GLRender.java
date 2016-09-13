@@ -12,6 +12,7 @@ import com.PointCloudVisualizer.GlObjects.CameraGL;
 import com.PointCloudVisualizer.GlObjects.RemotePointClusterGL;
 import com.PointCloudVisualizer.GlObjects.Scene;
 import com.PointCloudVisualizer.util.FPSCounter;
+import com.PointCloudVisualizer.util.PiCounter;
 import com.PointCloudVisualizer.util.ShaderHelper;
 import com.PointCloudVisualizer.util.TextResourceReader;
 
@@ -30,6 +31,8 @@ import static android.opengl.GLES20.glUseProgram;
 
 
 public class GLRender implements GLSurfaceView.Renderer {
+    private static final float IDLE_ROTATION_SPEED = 2f;
+    private static final float IDLE_ROTATION_AMPLITUDE = 0.04f;
     private final Context context;
 
     private static final String A_POSITION = "a_Position";
@@ -57,6 +60,7 @@ public class GLRender implements GLSurfaceView.Renderer {
     private float[] translation;
     private float scale;
 
+    private PiCounter piCounter;
 
     public GLRender(Context context, DataAccessLayer dal) {
         this.context = context;
@@ -65,6 +69,7 @@ public class GLRender implements GLSurfaceView.Renderer {
         translation = new float[]{0, 0, 0};
         scale = 1;
         fpsCounter = new FPSCounter();
+        piCounter = new PiCounter();
     }
 
     @Override
@@ -75,8 +80,9 @@ public class GLRender implements GLSurfaceView.Renderer {
         mProgram = createOpenGlProgram();
         glUseProgram(mProgram);
         receiveLocations();
-        dal.setServerUrl(PreferenceManager.getDefaultSharedPreferences(context).getString("serverIP",
-                "Invalid IP"));
+        dal.setServerUrl(PreferenceManager.
+                getDefaultSharedPreferences(context).
+                getString("serverIP", "Invalid IP"));
         camera = new CameraGL();
         scene = new Scene(gl);
         scene.setCamera(camera);
@@ -104,9 +110,26 @@ public class GLRender implements GLSurfaceView.Renderer {
         float[] backgroundColor = readBackgroundFromSettings();
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glFrontFace(GL_CCW);
+        idleRotation();
         scene.drawScene(aPositionLocation, aColorLocation, aSizeLocation, uMVPMatrixLocation);
-        //fpsCounter.logFrame();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
+    }
+
+    private void idleRotation() {
+        scene.rotateSceneNoUpdate(getIdleRotationAngles(
+                IDLE_ROTATION_AMPLITUDE,
+                IDLE_ROTATION_SPEED
+        ));
+    }
+
+    private float[] getIdleRotationAngles(float amplitude, float speed) {
+        piCounter.setSpeed(speed);
+        float x = piCounter.getTimeValue();
+        return new float[]{
+                (float) Math.sin(x) * amplitude,
+                (float) Math.sin(x) * amplitude,
+                0f
+        };
     }
 
     private float[] readBackgroundFromSettings() {
